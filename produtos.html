@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta Prime — Produtos</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --grafite: #1A1A18;
+    --grafite2: #242422;
+    --grafite3: #2e2e2b;
+    --grafite4: #383835;
+    --cobre: #B8955A;
+    --cobre-light: #d4ae7a;
+    --off: #F5F4F0;
+    --off2: #e8e7e3;
+    --muted: #888884;
+    --success: #4caf7d;
+    --warning: #e6a817;
+    --danger: #e05555;
+    --sidebar-w: 220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--grafite);
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--grafite2);
+    border-right: 1px solid rgba(184,149,90,0.1);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .sidebar-logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--off);
+  }
+
+  .sidebar-logo-sub {
+    font-size: 10px;
+    color: var(--cobre);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+
+  .nav-section {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 12px 24px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-item:hover { color: var(--off); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--cobre); border-left-color: var(--cobre); background: rgba(184,149,90,0.05); }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .logout-btn {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.15s;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .logout-btn:hover { color: var(--danger); }
+
+  /* MAIN */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    padding: 20px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+  }
+
+  .btn-primary {
+    background: var(--cobre);
+    color: var(--grafite);
+    border: none;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover { background: var(--cobre-light); }
+
+  .content { padding: 28px 32px; flex: 1; }
+
+  /* FILTROS */
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { color: var(--off); border-color: rgba(255,255,255,0.15); }
+  .filter-btn.active { background: rgba(184,149,90,0.1); color: var(--cobre); border-color: rgba(184,149,90,0.3); }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  tbody td {
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--off2);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-green { background: rgba(76,175,125,0.15); color: var(--success); }
+  .badge-red { background: rgba(224,85,85,0.15); color: var(--danger); }
+  .badge-cobre { background: rgba(184,149,90,0.15); color: var(--cobre); }
+
+  .action-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .action-btn:hover { color: var(--off); background: rgba(255,255,255,0.05); }
+  .action-btn.danger:hover { color: var(--danger); }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .margem {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .margem.boa { color: var(--success); }
+  .margem.media { color: var(--warning); }
+  .margem.baixa { color: var(--danger); }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--grafite2);
+    border: 1px solid rgba(184,149,90,0.2);
+    border-radius: 2px;
+    width: 100%;
+    max-width: 520px;
+    padding: 32px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 300;
+    margin-bottom: 24px;
+    color: var(--off);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  input, select {
+    width: 100%;
+    background: var(--grafite3);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 2px;
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus { border-color: rgba(184,149,90,0.4); }
+  select option { background: var(--grafite3); }
+
+  .margem-preview {
+    background: var(--grafite3);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 2px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--cobre);
+    font-weight: 500;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  .btn-cancel {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 2px;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-cancel:hover { color: var(--off); border-color: rgba(255,255,255,0.2); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--grafite4);
+    border: 1px solid rgba(184,149,90,0.3);
+    border-radius: 2px;
+    padding: 12px 20px;
+    font-size: 13px;
+    color: var(--off);
+    z-index: 300;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(76,175,125,0.4); color: var(--success); }
+  .toast.error { border-color: rgba(224,85,85,0.4); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-name">Gaeta Prime</div>
+    <div class="sidebar-logo-sub">Admin</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+    <a class="nav-item" href="vendas.html"><span class="nav-icon">◎</span> Vendas</a>
+    <a class="nav-item" href="estoque.html"><span class="nav-icon">◰</span> Estoque</a>
+    <a class="nav-item" href="clientes.html"><span class="nav-icon">◑</span> Clientes</a>
+    <div class="nav-section">Gestão</div>
+    <a class="nav-item active" href="produtos.html"><span class="nav-icon">◇</span> Produtos</a>
+    <a class="nav-item" href="parceiros.html"><span class="nav-icon">◈</span> Parceiros</a>
+    <a class="nav-item" href="comissoes.html"><span class="nav-icon">◎</span> Comissões</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="handleLogout()"><span>⊗</span> Sair</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Produtos</div>
+    <button class="btn-primary" onclick="openModal()">+ Novo Produto</button>
+  </div>
+
+  <div class="content">
+    <div class="filters">
+      <button class="filter-btn active" onclick="filtrar('todos', this)">Todos</button>
+      <button class="filter-btn" onclick="filtrar('iPhone', this)">iPhone</button>
+      <button class="filter-btn" onclick="filtrar('MacBook', this)">MacBook</button>
+      <button class="filter-btn" onclick="filtrar('iPad', this)">iPad</button>
+      <button class="filter-btn" onclick="filtrar('Watch', this)">Watch</button>
+      <button class="filter-btn" onclick="filtrar('AirPods', this)">AirPods</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Modelo</th>
+            <th>Cor</th>
+            <th>Storage</th>
+            <th>Custo</th>
+            <th>Venda</th>
+            <th>Margem</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="produtosBody">
+          <tr><td colspan="9" class="empty-state">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Novo Produto</div>
+    <input type="hidden" id="editId">
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="categoria" onchange="sugerirModelos()">
+          <option value="">Selecione</option>
+          <option>iPhone</option>
+          <option>MacBook</option>
+          <option>iPad</option>
+          <option>Watch</option>
+          <option>AirPods</option>
+          <option>Acessório</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Modelo</label>
+        <input type="text" id="modelo" placeholder="ex: iPhone 16 Pro Max">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cor</label>
+        <input type="text" id="cor" placeholder="ex: Titânio Deserto">
+      </div>
+      <div class="form-group">
+        <label>Armazenamento</label>
+        <input type="text" id="storage" placeholder="ex: 256GB">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Preço de Custo (R$)</label>
+        <input type="number" id="custo" placeholder="0,00" step="0.01" oninput="calcMargem()">
+      </div>
+      <div class="form-group">
+        <label>Preço de Venda (R$)</label>
+        <input type="number" id="venda" placeholder="0,00" step="0.01" oninput="calcMargem()">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Margem calculada</label>
+        <div class="margem-preview" id="margemPreview">—</div>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="status">
+          <option value="true">Ativo</option>
+          <option value="false">Inativo</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarProduto()">Salvar Produto</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  sb.auth.getSession().then(({ data }) => {
+    if (!data.session) window.location.href = 'login.html';
+  });
+
+  let todosProudtos = [];
+  let filtroAtivo = 'todos';
+
+  function formatBRL(v) {
+    return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+
+  function calcMargem() {
+    const custo = parseFloat(document.getElementById('custo').value) || 0;
+    const venda = parseFloat(document.getElementById('venda').value) || 0;
+    const preview = document.getElementById('margemPreview');
+    if (!custo || !venda) { preview.textContent = '—'; return; }
+    const lucro = venda - custo;
+    const pct = ((lucro / venda) * 100).toFixed(1);
+    preview.textContent = `${formatBRL(lucro)} (${pct}%)`;
+    preview.style.color = pct >= 20 ? 'var(--success)' : pct >= 10 ? 'var(--warning)' : 'var(--danger)';
+  }
+
+  function margemClass(custo, venda) {
+    if (!custo || !venda) return '';
+    const pct = ((venda - custo) / venda) * 100;
+    return pct >= 20 ? 'boa' : pct >= 10 ? 'media' : 'baixa';
+  }
+
+  function margemText(custo, venda) {
+    if (!custo || !venda) return '—';
+    const lucro = venda - custo;
+    const pct = ((lucro / venda) * 100).toFixed(1);
+    return `${pct}%`;
+  }
+
+  async function loadProdutos() {
+    const { data, error } = await sb.from('products').select('*').order('category').order('model');
+    if (error) { showToast('Erro ao carregar produtos', 'error'); return; }
+    todosProudtos = data || [];
+    renderProdutos();
+  }
+
+  function filtrar(cat, btn) {
+    filtroAtivo = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderProdutos();
+  }
+
+  function renderProdutos() {
+    const lista = filtroAtivo === 'todos'
+      ? todosProudtos
+      : todosProudtos.filter(p => p.category === filtroAtivo);
+
+    const tbody = document.getElementById('produtosBody');
+    if (!lista.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state">Nenhum produto cadastrado</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = lista.map(p => `
+      <tr>
+        <td><span class="badge badge-cobre">${p.category}</span></td>
+        <td>${p.model}</td>
+        <td>${p.color || '—'}</td>
+        <td>${p.storage || '—'}</td>
+        <td>${formatBRL(p.cost_price)}</td>
+        <td>${formatBRL(p.sale_price)}</td>
+        <td><span class="margem ${margemClass(p.cost_price, p.sale_price)}">${margemText(p.cost_price, p.sale_price)}</span></td>
+        <td><span class="badge ${p.active ? 'badge-green' : 'badge-red'}">${p.active ? 'Ativo' : 'Inativo'}</span></td>
+        <td>
+          <button class="action-btn" onclick='editarProduto(${JSON.stringify(p)})'>Editar</button>
+          <button class="action-btn danger" onclick="deletarProduto('${p.id}')">Excluir</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function openModal(p = null) {
+    document.getElementById('editId').value = '';
+    document.getElementById('modalTitle').textContent = 'Novo Produto';
+    document.getElementById('categoria').value = '';
+    document.getElementById('modelo').value = '';
+    document.getElementById('cor').value = '';
+    document.getElementById('storage').value = '';
+    document.getElementById('custo').value = '';
+    document.getElementById('venda').value = '';
+    document.getElementById('status').value = 'true';
+    document.getElementById('margemPreview').textContent = '—';
+    document.getElementById('margemPreview').style.color = 'var(--cobre)';
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function editarProduto(p) {
+    document.getElementById('editId').value = p.id;
+    document.getElementById('modalTitle').textContent = 'Editar Produto';
+    document.getElementById('categoria').value = p.category;
+    document.getElementById('modelo').value = p.model;
+    document.getElementById('cor').value = p.color || '';
+    document.getElementById('storage').value = p.storage || '';
+    document.getElementById('custo').value = p.cost_price;
+    document.getElementById('venda').value = p.sale_price;
+    document.getElementById('status').value = String(p.active);
+    calcMargem();
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  async function salvarProduto() {
+    const id = document.getElementById('editId').value;
+    const dados = {
+      category:   document.getElementById('categoria').value,
+      model:      document.getElementById('modelo').value.trim(),
+      color:      document.getElementById('cor').value.trim() || null,
+      storage:    document.getElementById('storage').value.trim() || null,
+      cost_price: parseFloat(document.getElementById('custo').value) || 0,
+      sale_price: parseFloat(document.getElementById('venda').value) || 0,
+      active:     document.getElementById('status').value === 'true',
+    };
+
+    if (!dados.category || !dados.model) {
+      showToast('Preencha categoria e modelo', 'error'); return;
+    }
+
+    let error;
+    if (id) {
+      ({ error } = await sb.from('products').update(dados).eq('id', id));
+    } else {
+      ({ error } = await sb.from('products').insert(dados));
+    }
+
+    if (error) { showToast('Erro ao salvar: ' + error.message, 'error'); return; }
+    showToast(id ? 'Produto atualizado' : 'Produto cadastrado', 'success');
+    closeModal();
+    loadProdutos();
+  }
+
+  async function deletarProduto(id) {
+    if (!confirm('Excluir este produto?')) return;
+    const { error } = await sb.from('products').delete().eq('id', id);
+    if (error) { showToast('Erro ao excluir', 'error'); return; }
+    showToast('Produto excluído', 'success');
+    loadProdutos();
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  // Fechar modal clicando fora
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  loadProdutos();
+</script>
+</body>
+</html>
