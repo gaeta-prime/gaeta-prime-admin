@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta Prime — Meu Painel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --grafite: #1A1A18;
+    --grafite2: #242422;
+    --grafite3: #2e2e2b;
+    --grafite4: #383835;
+    --cobre: #B8955A;
+    --cobre-light: #d4ae7a;
+    --off: #F5F4F0;
+    --off2: #e8e7e3;
+    --muted: #888884;
+    --success: #4caf7d;
+    --warning: #e6a817;
+    --danger: #e05555;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--grafite);
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--grafite2);
+    border-bottom: 1px solid rgba(184,149,90,0.12);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .header-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--off);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .parceiro-badge {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .parceiro-badge span {
+    font-family: monospace;
+    background: var(--grafite3);
+    border: 1px solid rgba(184,149,90,0.2);
+    border-radius: 2px;
+    padding: 2px 8px;
+    color: var(--cobre);
+    margin-left: 6px;
+  }
+
+  .logout-btn {
+    font-size: 11px;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: color 0.15s;
+    padding: 6px 10px;
+  }
+
+  .logout-btn:hover { color: var(--danger); }
+
+  /* CONTENT */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 36px 24px;
+  }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    margin-bottom: 6px;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  /* PERÍODO */
+  .periodo-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+
+  .periodo-btn {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 2px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .periodo-btn:hover { color: var(--off); }
+  .periodo-btn.active { background: rgba(184,149,90,0.1); color: var(--cobre); border-color: rgba(184,149,90,0.3); }
+
+  /* CARDS */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .card {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    padding: 20px 22px;
+  }
+
+  .card-accent { width: 20px; height: 2px; background: var(--cobre); margin-bottom: 12px; opacity: 0.4; }
+  .card-label { font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .card-val { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; }
+  .card-val.cobre { color: var(--cobre); }
+  .card-val.success { color: var(--success); }
+  .card-val.warning { color: var(--warning); }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* TABLE */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .table-wrap {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  tbody td {
+    padding: 13px 16px;
+    font-size: 13px;
+    color: var(--off2);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 2px; }
+  .badge-green  { background: rgba(76,175,125,0.15);  color: var(--success); }
+  .badge-yellow { background: rgba(230,168,23,0.15);  color: var(--warning); }
+  .badge-cobre  { background: rgba(184,149,90,0.15);  color: var(--cobre); }
+  .badge-grey   { background: rgba(136,136,132,0.15); color: var(--muted); }
+  .badge-red    { background: rgba(224,85,85,0.15);   color: var(--danger); }
+
+  .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+  /* AVISO */
+  .aviso {
+    background: rgba(184,149,90,0.06);
+    border: 1px solid rgba(184,149,90,0.15);
+    border-radius: 2px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 24px;
+    line-height: 1.7;
+  }
+
+  .loading { color: var(--muted); font-size: 13px; padding: 48px; text-align: center; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">Gaeta Prime</div>
+  <div class="header-right">
+    <div class="parceiro-badge" id="headerBadge">Parceiro <span id="headerCodigo">—</span></div>
+    <button class="logout-btn" onclick="handleLogout()">Sair</button>
+  </div>
+</header>
+
+<div class="content">
+  <div class="page-title" id="pageTitle">Olá!</div>
+  <div class="page-sub">Acompanhe suas vendas e comissões em tempo real.</div>
+
+  <div class="periodo-tabs">
+    <button class="periodo-btn active" onclick="setPeriodo(30, this)">Últimos 30 dias</button>
+    <button class="periodo-btn" onclick="setPeriodo(60, this)">Últimos 60 dias</button>
+    <button class="periodo-btn" onclick="setPeriodo(90, this)">Últimos 90 dias</button>
+    <button class="periodo-btn" onclick="setPeriodo(0, this)">Tudo</button>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="card-label">Vendas realizadas</div>
+      <div class="card-val" id="cardVendas">—</div>
+      <div class="card-sub">no período</div>
+    </div>
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="card-label">Total vendido</div>
+      <div class="card-val cobre" id="cardTotal">—</div>
+      <div class="card-sub">valor das vendas</div>
+    </div>
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="card-label">Comissão gerada</div>
+      <div class="card-val success" id="cardComissao">—</div>
+      <div class="card-sub">no período</div>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="card-label">Comissão pendente</div>
+      <div class="card-val warning" id="cardPendente">—</div>
+      <div class="card-sub">a receber</div>
+    </div>
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="card-label">Já recebido</div>
+      <div class="card-val success" id="cardRecebido">—</div>
+      <div class="card-sub">total pago</div>
+    </div>
+    <div class="card">
+      <div class="card-accent"></div>
+      <div class="card-label">Minha comissão</div>
+      <div class="card-val cobre" id="cardPct">—</div>
+      <div class="card-sub">por venda</div>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <span class="section-title">Minhas vendas</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Produto</th>
+          <th>Valor da venda</th>
+          <th>Minha comissão</th>
+          <th>Status</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+      <tbody id="vendasBody">
+        <tr><td colspan="5" class="loading">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="aviso">
+    Os valores de comissão pendente são pagos pela Gaeta Prime conforme acordado. Em caso de dúvidas, entre em contato diretamente.
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let parceiro = null;
+  let todasVendas = [];
+  let pagamentos = [];
+  let periodoAtivo = 30;
+
+  const STATUS_MAP = {
+    pedido_recebido:    ['badge-grey',   'Recebido'],
+    pagamento_pendente: ['badge-yellow', 'Pend. Pgto'],
+    pagamento_aprovado: ['badge-cobre',  'Pago'],
+    em_preparacao:      ['badge-cobre',  'Em Prep.'],
+    enviado:            ['badge-cobre',  'Enviado'],
+    entregue:           ['badge-green',  'Entregue'],
+    finalizado:         ['badge-green',  'Finalizado'],
+    cancelado:          ['badge-red',    'Cancelado'],
+  };
+
+  function formatBRL(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
+  function formatDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('pt-BR'); }
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'parceiro-acesso.html'; return; }
+
+    const email = session.user.email;
+
+    // Busca parceiro pelo e-mail
+    const { data, error } = await sb.from('partners')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (error || !data) {
+      alert('Parceiro não encontrado. Entre em contato com a Gaeta Prime.');
+      await sb.auth.signOut();
+      window.location.href = 'parceiro-acesso.html';
+      return;
+    }
+
+    parceiro = data;
+
+    document.getElementById('pageTitle').textContent = `Olá, ${parceiro.name.split(' ')[0]}!`;
+    document.getElementById('headerCodigo').textContent = parceiro.code;
+    document.getElementById('cardPct').textContent = parceiro.commission_pct + '%';
+
+    await loadDados();
+  }
+
+  async function loadDados() {
+    const [v, pg] = await Promise.all([
+      sb.from('sales')
+        .select('product_name, sale_price, commission_value, commission_pct, status, sold_at')
+        .eq('partner_id', parceiro.id)
+        .order('sold_at', { ascending: false }),
+      sb.from('commission_payments')
+        .select('amount')
+        .eq('partner_id', parceiro.id),
+    ]);
+
+    todasVendas = v.data || [];
+    pagamentos = pg.data || [];
+
+    renderDados();
+  }
+
+  function setPeriodo(dias, btn) {
+    periodoAtivo = dias;
+    document.querySelectorAll('.periodo-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderDados();
+  }
+
+  function renderDados() {
+    const agora = new Date();
+    const inicio = periodoAtivo > 0
+      ? new Date(agora.getTime() - periodoAtivo * 24 * 60 * 60 * 1000)
+      : null;
+
+    const vendas = inicio
+      ? todasVendas.filter(v => new Date(v.sold_at) >= inicio)
+      : todasVendas;
+
+    const ativas = vendas.filter(v => v.status !== 'cancelado');
+    const totalVendido = ativas.reduce((a, v) => a + Number(v.sale_price||0), 0);
+    const totalComissao = ativas.reduce((a, v) => a + Number(v.commission_value||0), 0);
+    const pendente = ativas
+      .filter(v => !['finalizado'].includes(v.status))
+      .reduce((a, v) => a + Number(v.commission_value||0), 0);
+    const recebido = pagamentos.reduce((a, p) => a + Number(p.amount||0), 0);
+
+    document.getElementById('cardVendas').textContent = ativas.length;
+    document.getElementById('cardTotal').textContent = formatBRL(totalVendido);
+    document.getElementById('cardComissao').textContent = formatBRL(totalComissao);
+    document.getElementById('cardPendente').textContent = formatBRL(pendente);
+    document.getElementById('cardRecebido').textContent = formatBRL(recebido);
+
+    // Tabela
+    const tbody = document.getElementById('vendasBody');
+    if (!vendas.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhuma venda no período</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = vendas.map(v => {
+      const [scls, slbl] = STATUS_MAP[v.status] || ['badge-grey', v.status];
+      return `<tr>
+        <td>${v.product_name}</td>
+        <td style="color:var(--cobre)">${formatBRL(v.sale_price)}</td>
+        <td style="color:var(--success);font-weight:500">${formatBRL(v.commission_value)}</td>
+        <td><span class="badge ${scls}">${slbl}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${formatDate(v.sold_at)}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'parceiro-acesso.html';
+  }
+
+  init();
+</script>
+</body>
+</html>

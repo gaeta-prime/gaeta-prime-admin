@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta Prime — Portal do Parceiro</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --grafite: #1A1A18;
+    --grafite2: #242422;
+    --grafite3: #2e2e2b;
+    --cobre: #B8955A;
+    --cobre-light: #d4ae7a;
+    --off: #F5F4F0;
+    --muted: #888884;
+    --success: #4caf7d;
+    --danger: #e05555;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--grafite);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(184,149,90,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .card {
+    background: var(--grafite2);
+    border: 1px solid rgba(184,149,90,0.15);
+    border-radius: 2px;
+    padding: 52px 48px 44px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 300;
+    color: var(--off);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  .logo-sub {
+    font-size: 10px;
+    color: var(--cobre);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .divider {
+    width: 28px;
+    height: 1px;
+    background: var(--cobre);
+    margin: 14px auto 0;
+    opacity: 0.4;
+  }
+
+  /* STEP 1 */
+  #step1, #step2 { transition: opacity 0.2s; }
+
+  .step-title {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .field { margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  input {
+    width: 100%;
+    background: var(--grafite3);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 2px;
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  input#otp {
+    text-transform: none;
+    letter-spacing: 0.3em;
+    font-size: 20px;
+    text-align: center;
+    font-family: monospace;
+  }
+
+  input:focus { border-color: rgba(184,149,90,0.4); }
+  input::placeholder { color: var(--muted); opacity: 0.4; text-transform: none; letter-spacing: 0; font-size: 13px; }
+
+  .btn {
+    width: 100%;
+    background: var(--cobre);
+    color: var(--grafite);
+    border: none;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, opacity 0.2s;
+  }
+
+  .btn:hover { background: var(--cobre-light); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .error-msg {
+    background: rgba(224,85,85,0.1);
+    border: 1px solid rgba(224,85,85,0.3);
+    border-radius: 2px;
+    color: #e74c3c;
+    font-size: 12px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    display: none;
+  }
+
+  .success-msg {
+    background: rgba(76,175,125,0.1);
+    border: 1px solid rgba(76,175,125,0.3);
+    border-radius: 2px;
+    color: var(--success);
+    font-size: 12px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    display: none;
+    text-align: center;
+  }
+
+  .back-link {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+
+  .back-link:hover { color: var(--off); }
+
+  .footer-text {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 32px;
+    opacity: 0.4;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-name">Gaeta Prime</div>
+    <div class="logo-sub">Portal do Parceiro</div>
+    <div class="divider"></div>
+  </div>
+
+  <!-- STEP 1: código -->
+  <div id="step1">
+    <p class="step-title">Informe seu código de parceiro para receber o link de acesso.</p>
+
+    <div class="field">
+      <label>Seu código</label>
+      <input type="text" id="codigo" placeholder="ex: ALVES" maxlength="20"
+        oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')">
+    </div>
+
+    <button class="btn" id="btnCodigo" onclick="verificarCodigo()">Continuar</button>
+    <div class="error-msg" id="erroCodigo"></div>
+  </div>
+
+  <!-- STEP 2: OTP -->
+  <div id="step2" style="display:none">
+    <p class="step-title" id="step2Msg">Enviamos um código de 6 dígitos para o seu e-mail.</p>
+
+    <div class="field">
+      <label>Código de verificação</label>
+      <input type="text" id="otp" placeholder="000000" maxlength="6"
+        oninput="this.value = this.value.replace(/\D/g,'')">
+    </div>
+
+    <button class="btn" id="btnOtp" onclick="verificarOtp()">Entrar</button>
+    <div class="error-msg" id="erroOtp"></div>
+    <div class="success-msg" id="successOtp"></div>
+    <div class="back-link" onclick="voltarStep1()">← Usar outro código</div>
+  </div>
+
+  <p class="footer-text">Gaeta Prime © 2025</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Se já tem sessão, redireciona
+  sb.auth.getSession().then(({ data }) => {
+    if (data.session) window.location.href = 'parceiro-painel.html';
+  });
+
+  let parceiroEmail = '';
+
+  async function verificarCodigo() {
+    const codigo = document.getElementById('codigo').value.trim();
+    const btn = document.getElementById('btnCodigo');
+    const err = document.getElementById('erroCodigo');
+    err.style.display = 'none';
+
+    if (!codigo) { showErr(err, 'Informe seu código.'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    const { data, error } = await sb.from('partners')
+      .select('id, name, email, active')
+      .eq('code', codigo)
+      .single();
+
+    if (error || !data) {
+      showErr(err, 'Código não encontrado. Verifique e tente novamente.');
+      btn.disabled = false;
+      btn.textContent = 'Continuar';
+      return;
+    }
+
+    if (!data.active) {
+      showErr(err, 'Este código está inativo. Entre em contato com a Gaeta Prime.');
+      btn.disabled = false;
+      btn.textContent = 'Continuar';
+      return;
+    }
+
+    if (!data.email) {
+      showErr(err, 'Nenhum e-mail cadastrado para este parceiro. Contate a Gaeta Prime.');
+      btn.disabled = false;
+      btn.textContent = 'Continuar';
+      return;
+    }
+
+    parceiroEmail = data.email;
+
+    // Envia OTP
+    const { error: otpErr } = await sb.auth.signInWithOtp({
+      email: parceiroEmail,
+      options: { shouldCreateUser: true }
+    });
+
+    if (otpErr) {
+      showErr(err, 'Erro ao enviar código. Tente novamente.');
+      btn.disabled = false;
+      btn.textContent = 'Continuar';
+      return;
+    }
+
+    // Mostra step 2
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    const emailMasked = parceiroEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3');
+    document.getElementById('step2Msg').textContent = `Enviamos um código de 6 dígitos para ${emailMasked}. Verifique sua caixa de entrada.`;
+  }
+
+  async function verificarOtp() {
+    const otp = document.getElementById('otp').value.trim();
+    const btn = document.getElementById('btnOtp');
+    const err = document.getElementById('erroOtp');
+    const suc = document.getElementById('successOtp');
+    err.style.display = 'none';
+    suc.style.display = 'none';
+
+    if (otp.length < 6) { showErr(err, 'Digite o código de 6 dígitos.'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    const { error } = await sb.auth.verifyOtp({
+      email: parceiroEmail,
+      token: otp,
+      type: 'email',
+    });
+
+    if (error) {
+      showErr(err, 'Código inválido ou expirado. Tente novamente.');
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+      return;
+    }
+
+    suc.textContent = 'Acesso confirmado! Redirecionando...';
+    suc.style.display = 'block';
+    setTimeout(() => window.location.href = 'parceiro-painel.html', 1200);
+  }
+
+  function voltarStep1() {
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('otp').value = '';
+    document.getElementById('btnCodigo').disabled = false;
+    document.getElementById('btnCodigo').textContent = 'Continuar';
+    parceiroEmail = '';
+  }
+
+  function showErr(el, msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('step2').style.display === 'none') {
+        verificarCodigo();
+      } else {
+        verificarOtp();
+      }
+    }
+  });
+</script>
+</body>
+</html>
