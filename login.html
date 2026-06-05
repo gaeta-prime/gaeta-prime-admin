@@ -185,10 +185,10 @@
 <script>
   const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Redireciona se já logado
-  supabase.auth.getSession().then(({ data }) => {
+  sb.auth.getSession().then(({ data }) => {
     if (data.session) window.location.href = 'dashboard.html';
   });
 
@@ -208,7 +208,7 @@
     btn.disabled = true;
     btn.textContent = 'Entrando...';
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await sb.auth.signInWithPassword({ email, password });
 
     if (error) {
       showError('E-mail ou senha incorretos.');
