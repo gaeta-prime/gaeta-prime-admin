@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta Prime — Estoque</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --grafite: #1A1A18;
+    --grafite2: #242422;
+    --grafite3: #2e2e2b;
+    --grafite4: #383835;
+    --cobre: #B8955A;
+    --cobre-light: #d4ae7a;
+    --off: #F5F4F0;
+    --off2: #e8e7e3;
+    --muted: #888884;
+    --success: #4caf7d;
+    --warning: #e6a817;
+    --danger: #e05555;
+    --sidebar-w: 220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--grafite);
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--grafite2);
+    border-right: 1px solid rgba(184,149,90,0.1);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .sidebar-logo-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; }
+  .sidebar-logo-sub { font-size: 10px; color: var(--cobre); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 2px; }
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+  .nav-section { font-size: 9px; font-weight: 500; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; padding: 12px 24px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--off); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--cobre); border-left-color: var(--cobre); background: rgba(184,149,90,0.05); }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .logout-btn { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: color 0.15s; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+  .logout-btn:hover { color: var(--danger); }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+
+  .topbar {
+    padding: 20px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .btn-primary {
+    background: var(--cobre);
+    color: var(--grafite);
+    border: none;
+    border-radius: 2px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover { background: var(--cobre-light); }
+
+  .content { padding: 28px 32px; flex: 1; }
+
+  /* RESUMO */
+  .resumo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .resumo-card {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    padding: 16px 20px;
+  }
+
+  .resumo-label { font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .resumo-val { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; }
+  .resumo-val.cobre { color: var(--cobre); }
+  .resumo-val.success { color: var(--success); }
+  .resumo-val.warning { color: var(--warning); }
+
+  /* FILTROS */
+  .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+
+  .filter-btn {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 7px 16px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.08);
+    background: transparent; color: var(--muted); cursor: pointer;
+    font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+  }
+
+  .filter-btn:hover { color: var(--off); border-color: rgba(255,255,255,0.15); }
+  .filter-btn.active { background: rgba(184,149,90,0.1); color: var(--cobre); border-color: rgba(184,149,90,0.3); }
+
+  .search-input {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 2px;
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 7px 14px;
+    outline: none;
+    width: 200px;
+    margin-left: auto;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: rgba(184,149,90,0.3); }
+  .search-input::placeholder { color: var(--muted); opacity: 0.5; }
+
+  /* TABLE */
+  .table-wrap { background: var(--grafite2); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 12px 16px; text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  tbody td { padding: 13px 16px; font-size: 13px; color: var(--off2); border-bottom: 1px solid rgba(255,255,255,0.03); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 2px; letter-spacing: 0.05em; }
+  .badge-green { background: rgba(76,175,125,0.15); color: var(--success); }
+  .badge-yellow { background: rgba(230,168,23,0.15); color: var(--warning); }
+  .badge-red { background: rgba(224,85,85,0.15); color: var(--danger); }
+  .badge-cobre { background: rgba(184,149,90,0.15); color: var(--cobre); }
+  .badge-grey { background: rgba(136,136,132,0.15); color: var(--muted); }
+
+  .action-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 2px; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .action-btn:hover { color: var(--off); background: rgba(255,255,255,0.05); }
+  .action-btn.danger:hover { color: var(--danger); }
+
+  .empty-state { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+
+  .modal { background: var(--grafite2); border: 1px solid rgba(184,149,90,0.2); border-radius: 2px; width: 100%; max-width: 480px; padding: 32px; }
+
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; margin-bottom: 24px; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label { display: block; font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+
+  input, select, textarea {
+    width: 100%; background: var(--grafite3); border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 2px; color: var(--off); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; padding: 10px 12px; outline: none; transition: border-color 0.2s;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: rgba(184,149,90,0.4); }
+  select option { background: var(--grafite3); }
+  textarea { resize: vertical; min-height: 70px; }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  .btn-cancel { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 2px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 20px; cursor: pointer; transition: all 0.15s; }
+  .btn-cancel:hover { color: var(--off); border-color: rgba(255,255,255,0.2); }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--grafite4); border: 1px solid rgba(184,149,90,0.3); border-radius: 2px; padding: 12px 20px; font-size: 13px; color: var(--off); z-index: 300; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(76,175,125,0.4); color: var(--success); }
+  .toast.error { border-color: rgba(224,85,85,0.4); color: var(--danger); }
+
+  .produto-info { font-size: 11px; color: var(--muted); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-name">Gaeta Prime</div>
+    <div class="sidebar-logo-sub">Admin</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+    <a class="nav-item" href="vendas.html"><span class="nav-icon">◎</span> Vendas</a>
+    <a class="nav-item active" href="estoque.html"><span class="nav-icon">◰</span> Estoque</a>
+    <a class="nav-item" href="clientes.html"><span class="nav-icon">◑</span> Clientes</a>
+    <div class="nav-section">Gestão</div>
+    <a class="nav-item" href="produtos.html"><span class="nav-icon">◇</span> Produtos</a>
+    <a class="nav-item" href="parceiros.html"><span class="nav-icon">◈</span> Parceiros</a>
+    <a class="nav-item" href="comissoes.html"><span class="nav-icon">◎</span> Comissões</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="handleLogout()"><span>⊗</span> Sair</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Estoque em Mãos</div>
+    <div class="topbar-right">
+      <button class="btn-primary" onclick="openModal()">+ Registrar Aparelho</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <div class="resumo-grid">
+      <div class="resumo-card">
+        <div class="resumo-label">Em mãos</div>
+        <div class="resumo-val" id="totalMaos">—</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-label">Reservados</div>
+        <div class="resumo-val warning" id="totalReservados">—</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-label">Valor em estoque</div>
+        <div class="resumo-val cobre" id="valorEstoque">—</div>
+      </div>
+      <div class="resumo-card">
+        <div class="resumo-label">Lucro potencial</div>
+        <div class="resumo-val success" id="lucroPotencial">—</div>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="filtrar('todos', this)">Todos</button>
+      <button class="filter-btn" onclick="filtrar('disponivel', this)">Disponível</button>
+      <button class="filter-btn" onclick="filtrar('reservado', this)">Reservado</button>
+      <input class="search-input" type="text" placeholder="Buscar modelo, IMEI..." oninput="buscar(this.value)">
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Cor / Storage</th>
+            <th>IMEI</th>
+            <th>Condição</th>
+            <th>Custo</th>
+            <th>Venda</th>
+            <th>Lucro</th>
+            <th>Status</th>
+            <th>Obs</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="estoqueBody">
+          <tr><td colspan="10" class="empty-state">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Registrar Aparelho</div>
+    <input type="hidden" id="editId">
+
+    <div class="form-group full">
+      <label>Produto</label>
+      <select id="productId" onchange="preencherPrecos()">
+        <option value="">Selecione o produto</option>
+      </select>
+      <div class="produto-info" id="produtoInfo"></div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>IMEI (opcional)</label>
+        <input type="text" id="imei" placeholder="000000000000000">
+      </div>
+      <div class="form-group">
+        <label>Condição</label>
+        <select id="condicao">
+          <option value="LACRADO">Lacrado</option>
+          <option value="VITRINE">Vitrine</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Status</label>
+        <select id="statusItem">
+          <option value="disponivel">Disponível</option>
+          <option value="reservado">Reservado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data de entrada</label>
+        <input type="date" id="dataEntrada">
+      </div>
+    </div>
+
+    <div class="form-group full">
+      <label>Observações</label>
+      <textarea id="obs" placeholder="Alguma observação sobre este aparelho..."></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="salvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  sb.auth.getSession().then(({ data }) => {
+    if (!data.session) window.location.href = 'login.html';
+  });
+
+  let todosItens = [];
+  let produtos = [];
+  let filtroAtivo = 'todos';
+  let buscaAtiva = '';
+
+  function formatBRL(v) {
+    return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+
+  async function loadProdutos() {
+    const { data } = await sb.from('products').select('*').eq('active', true).order('category').order('model');
+    produtos = data || [];
+    const sel = document.getElementById('productId');
+    sel.innerHTML = '<option value="">Selecione o produto</option>';
+    produtos.forEach(p => {
+      const label = `${p.category} — ${p.model}${p.color ? ' ' + p.color : ''}${p.storage ? ' ' + p.storage : ''}`;
+      sel.innerHTML += `<option value="${p.id}">${label}</option>`;
+    });
+  }
+
+  function preencherPrecos() {
+    const id = document.getElementById('productId').value;
+    const p = produtos.find(x => x.id === id);
+    const info = document.getElementById('produtoInfo');
+    if (p) {
+      const lucro = p.sale_price - p.cost_price;
+      const pct = ((lucro / p.sale_price) * 100).toFixed(1);
+      info.textContent = `Custo: ${formatBRL(p.cost_price)} · Venda: ${formatBRL(p.sale_price)} · Lucro: ${formatBRL(lucro)} (${pct}%)`;
+    } else {
+      info.textContent = '';
+    }
+  }
+
+  async function loadEstoque() {
+    const { data, error } = await sb.from('inventory')
+      .select('*, products(model, color, storage, category, cost_price, sale_price)')
+      .order('acquired_at', { ascending: false });
+
+    if (error) { showToast('Erro ao carregar estoque', 'error'); return; }
+    todosItens = data || [];
+    calcResumo();
+    renderEstoque();
+  }
+
+  function calcResumo() {
+    const disponiveis = todosItens.filter(i => i.status === 'disponivel');
+    const reservados  = todosItens.filter(i => i.status === 'reservado');
+    const ativos = [...disponiveis, ...reservados];
+
+    document.getElementById('totalMaos').textContent = disponiveis.length;
+    document.getElementById('totalReservados').textContent = reservados.length;
+    document.getElementById('valorEstoque').textContent = formatBRL(ativos.reduce((a, i) => a + Number(i.products?.cost_price || 0), 0));
+    document.getElementById('lucroPotencial').textContent = formatBRL(ativos.reduce((a, i) => {
+      const p = i.products;
+      return a + (p ? Number(p.sale_price) - Number(p.cost_price) : 0);
+    }, 0));
+  }
+
+  function filtrar(f, btn) {
+    filtroAtivo = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderEstoque();
+  }
+
+  function buscar(q) {
+    buscaAtiva = q.toLowerCase();
+    renderEstoque();
+  }
+
+  function renderEstoque() {
+    let lista = todosItens;
+    if (filtroAtivo !== 'todos') lista = lista.filter(i => i.status === filtroAtivo);
+    if (buscaAtiva) lista = lista.filter(i =>
+      (i.products?.model || '').toLowerCase().includes(buscaAtiva) ||
+      (i.imei || '').includes(buscaAtiva)
+    );
+
+    const tbody = document.getElementById('estoqueBody');
+    if (!lista.length) {
+      tbody.innerHTML = '<tr><td colspan="10" class="empty-state">Nenhum aparelho registrado</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = lista.map(i => {
+      const p = i.products || {};
+      const lucro = Number(p.sale_price || 0) - Number(p.cost_price || 0);
+      const pct = p.sale_price ? ((lucro / p.sale_price) * 100).toFixed(1) : 0;
+      const statusMap = {
+        disponivel: ['badge-green', 'Disponível'],
+        reservado:  ['badge-yellow', 'Reservado'],
+        vendido:    ['badge-grey', 'Vendido'],
+      };
+      const [scls, slbl] = statusMap[i.status] || ['badge-grey', i.status];
+
+      return `<tr>
+        <td><span class="badge badge-cobre" style="margin-right:6px">${p.category || ''}</span>${p.model || '—'}</td>
+        <td>${[p.color, p.storage].filter(Boolean).join(' · ') || '—'}</td>
+        <td style="font-size:11px;color:var(--muted)">${i.imei || '—'}</td>
+        <td><span class="badge ${i.condition === 'LACRADO' ? 'badge-green' : 'badge-yellow'}">${i.condition}</span></td>
+        <td>${formatBRL(p.cost_price)}</td>
+        <td>${formatBRL(p.sale_price)}</td>
+        <td style="color:var(--success)">${formatBRL(lucro)} <span style="color:var(--muted);font-size:11px">(${pct}%)</span></td>
+        <td><span class="badge ${scls}">${slbl}</span></td>
+        <td style="font-size:11px;color:var(--muted);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.notes || '—'}</td>
+        <td>
+          <button class="action-btn" onclick='editarItem(${JSON.stringify(i)})'>Editar</button>
+          <button class="action-btn danger" onclick="deletarItem('${i.id}')">Excluir</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function openModal() {
+    document.getElementById('editId').value = '';
+    document.getElementById('modalTitle').textContent = 'Registrar Aparelho';
+    document.getElementById('productId').value = '';
+    document.getElementById('produtoInfo').textContent = '';
+    document.getElementById('imei').value = '';
+    document.getElementById('condicao').value = 'LACRADO';
+    document.getElementById('statusItem').value = 'disponivel';
+    document.getElementById('obs').value = '';
+    document.getElementById('dataEntrada').value = new Date().toISOString().split('T')[0];
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function editarItem(i) {
+    document.getElementById('editId').value = i.id;
+    document.getElementById('modalTitle').textContent = 'Editar Aparelho';
+    document.getElementById('productId').value = i.product_id;
+    preencherPrecos();
+    document.getElementById('imei').value = i.imei || '';
+    document.getElementById('condicao').value = i.condition;
+    document.getElementById('statusItem').value = i.status;
+    document.getElementById('obs').value = i.notes || '';
+    document.getElementById('dataEntrada').value = i.acquired_at ? i.acquired_at.split('T')[0] : '';
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  async function salvar() {
+    const id = document.getElementById('editId').value;
+    const productId = document.getElementById('productId').value;
+    if (!productId) { showToast('Selecione o produto', 'error'); return; }
+
+    const dados = {
+      product_id:   productId,
+      imei:         document.getElementById('imei').value.trim() || null,
+      condition:    document.getElementById('condicao').value,
+      status:       document.getElementById('statusItem').value,
+      notes:        document.getElementById('obs').value.trim() || null,
+      acquired_at:  document.getElementById('dataEntrada').value || new Date().toISOString(),
+    };
+
+    let error;
+    if (id) {
+      ({ error } = await sb.from('inventory').update(dados).eq('id', id));
+    } else {
+      ({ error } = await sb.from('inventory').insert(dados));
+    }
+
+    if (error) { showToast('Erro: ' + error.message, 'error'); return; }
+    showToast(id ? 'Aparelho atualizado' : 'Aparelho registrado', 'success');
+    closeModal();
+    loadEstoque();
+  }
+
+  async function deletarItem(id) {
+    if (!confirm('Remover este aparelho do estoque?')) return;
+    const { error } = await sb.from('inventory').delete().eq('id', id);
+    if (error) { showToast('Erro ao remover', 'error'); return; }
+    showToast('Removido', 'success');
+    loadEstoque();
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  loadProdutos();
+  loadEstoque();
+</script>
+</body>
+</html>
