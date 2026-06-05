@@ -553,7 +553,7 @@
     if (!custo || !venda) return '—';
     const lucro = venda - custo;
     const pct = ((lucro / venda) * 100).toFixed(1);
-    return `${pct}%`;
+    return `${formatBRL(lucro)} (${pct}%)`;
   }
 
   async function loadProdutos() {
