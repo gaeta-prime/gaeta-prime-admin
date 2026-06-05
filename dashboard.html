@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta Prime — Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --grafite: #1A1A18;
+    --grafite2: #242422;
+    --grafite3: #2e2e2b;
+    --grafite4: #383835;
+    --cobre: #B8955A;
+    --cobre-light: #d4ae7a;
+    --off: #F5F4F0;
+    --off2: #e8e7e3;
+    --muted: #888884;
+    --success: #4caf7d;
+    --warning: #e6a817;
+    --danger: #e05555;
+    --sidebar-w: 220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--grafite);
+    color: var(--off);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--grafite2);
+    border-right: 1px solid rgba(184,149,90,0.1);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .sidebar-logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .sidebar-logo-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--off);
+  }
+
+  .sidebar-logo-sub {
+    font-size: 10px;
+    color: var(--cobre);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .sidebar-nav {
+    padding: 16px 0;
+    flex: 1;
+  }
+
+  .nav-section {
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 12px 24px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+  }
+
+  .nav-item:hover { color: var(--off); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--cobre); border-left-color: var(--cobre); background: rgba(184,149,90,0.05); }
+
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .logout-btn {
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.15s;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .logout-btn:hover { color: var(--danger); }
+
+  /* MAIN */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .topbar {
+    padding: 20px 32px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--off);
+  }
+
+  .topbar-date {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .content {
+    padding: 28px 32px;
+    flex: 1;
+  }
+
+  /* CARDS */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .card {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    padding: 20px 24px;
+  }
+
+  .card-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .card-value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--off);
+    line-height: 1;
+  }
+
+  .card-value.cobre { color: var(--cobre); }
+  .card-value.success { color: var(--success); }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .card-accent {
+    width: 24px;
+    height: 2px;
+    background: var(--cobre);
+    margin-bottom: 14px;
+    opacity: 0.5;
+  }
+
+  /* SECTION */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .btn-small {
+    font-size: 11px;
+    color: var(--cobre);
+    background: none;
+    border: 1px solid rgba(184,149,90,0.3);
+    border-radius: 2px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-small:hover { background: rgba(184,149,90,0.08); }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  tbody td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--off2);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .badge-green { background: rgba(76,175,125,0.15); color: var(--success); }
+  .badge-yellow { background: rgba(230,168,23,0.15); color: var(--warning); }
+  .badge-red { background: rgba(224,85,85,0.15); color: var(--danger); }
+  .badge-grey { background: rgba(136,136,132,0.15); color: var(--muted); }
+  .badge-cobre { background: rgba(184,149,90,0.15); color: var(--cobre); }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .loading { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-name">Gaeta Prime</div>
+    <div class="sidebar-logo-sub">Admin</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item active" href="dashboard.html">
+      <span class="nav-icon">◈</span> Dashboard
+    </a>
+    <a class="nav-item" href="vendas.html">
+      <span class="nav-icon">◎</span> Vendas
+    </a>
+    <a class="nav-item" href="estoque.html">
+      <span class="nav-icon">◰</span> Estoque
+    </a>
+    <a class="nav-item" href="clientes.html">
+      <span class="nav-icon">◑</span> Clientes
+    </a>
+
+    <div class="nav-section">Gestão</div>
+    <a class="nav-item" href="produtos.html">
+      <span class="nav-icon">◇</span> Produtos
+    </a>
+    <a class="nav-item" href="parceiros.html">
+      <span class="nav-icon">◈</span> Parceiros
+    </a>
+    <a class="nav-item" href="comissoes.html">
+      <span class="nav-icon">◎</span> Comissões
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="handleLogout()">
+      <span>⊗</span> Sair
+    </button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <div class="topbar-date" id="currentDate"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- CARDS HOJE -->
+    <div class="section-header">
+      <span class="section-title">Hoje</span>
+    </div>
+    <div class="cards-grid" style="margin-bottom:28px">
+      <div class="card">
+        <div class="card-accent"></div>
+        <div class="card-label">Vendas do dia</div>
+        <div class="card-value" id="vendasHoje">—</div>
+        <div class="card-sub">unidades vendidas</div>
+      </div>
+      <div class="card">
+        <div class="card-accent"></div>
+        <div class="card-label">Faturamento do dia</div>
+        <div class="card-value cobre" id="faturamentoHoje">—</div>
+        <div class="card-sub">valor total</div>
+      </div>
+      <div class="card">
+        <div class="card-accent"></div>
+        <div class="card-label">Lucro do dia</div>
+        <div class="card-value success" id="lucroHoje">—</div>
+        <div class="card-sub">lucro líquido</div>
+      </div>
+    </div>
+
+    <!-- CARDS MÊS -->
+    <div class="section-header">
+      <span class="section-title">Este mês</span>
+    </div>
+    <div class="cards-grid" style="margin-bottom:32px">
+      <div class="card">
+        <div class="card-accent"></div>
+        <div class="card-label">Vendas do mês</div>
+        <div class="card-value" id="vendasMes">—</div>
+        <div class="card-sub">unidades vendidas</div>
+      </div>
+      <div class="card">
+        <div class="card-accent"></div>
+        <div class="card-label">Faturamento do mês</div>
+        <div class="card-value cobre" id="faturamentoMes">—</div>
+        <div class="card-sub">valor total</div>
+      </div>
+      <div class="card">
+        <div class="card-accent"></div>
+        <div class="card-label">Lucro do mês</div>
+        <div class="card-value success" id="lucroMes">—</div>
+        <div class="card-sub">lucro líquido</div>
+      </div>
+    </div>
+
+    <!-- ÚLTIMAS VENDAS + TOP PARCEIROS -->
+    <div class="two-col">
+      <div>
+        <div class="section-header">
+          <span class="section-title">Últimas vendas</span>
+          <a class="btn-small" href="vendas.html">Ver todas</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Cliente</th>
+                <th>Valor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="ultimasVendas">
+              <tr><td colspan="4" class="empty-state">Nenhuma venda ainda</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header">
+          <span class="section-title">Top parceiros</span>
+          <a class="btn-small" href="parceiros.html">Ver todos</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Parceiro</th>
+                <th>Vendas</th>
+                <th>Comissão</th>
+              </tr>
+            </thead>
+            <tbody id="topParceiros">
+              <tr><td colspan="3" class="empty-state">Nenhum parceiro ainda</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-header" style="margin-top:20px">
+          <span class="section-title">Estoque disponível</span>
+          <a class="btn-small" href="estoque.html">Ver tudo</a>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Qtd</th>
+              </tr>
+            </thead>
+            <tbody id="estoqueResumo">
+              <tr><td colspan="2" class="empty-state">Nenhum item em estoque</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // Verifica sessão
+  sb.auth.getSession().then(({ data }) => {
+    if (!data.session) window.location.href = 'login.html';
+  });
+
+  // Data atual
+  const now = new Date();
+  document.getElementById('currentDate').textContent = now.toLocaleDateString('pt-BR', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  function formatBRL(v) {
+    return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+
+  function statusBadge(s) {
+    const map = {
+      pedido_recebido:    ['badge-grey',   'Recebido'],
+      pagamento_pendente: ['badge-yellow', 'Pend. Pagamento'],
+      pagamento_aprovado: ['badge-cobre',  'Pag. Aprovado'],
+      em_preparacao:      ['badge-cobre',  'Em Prep.'],
+      enviado:            ['badge-cobre',  'Enviado'],
+      entregue:           ['badge-green',  'Entregue'],
+      finalizado:         ['badge-green',  'Finalizado'],
+      cancelado:          ['badge-red',    'Cancelado'],
+    };
+    const [cls, label] = map[s] || ['badge-grey', s];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+
+  async function loadDashboard() {
+    const hoje = new Date();
+    const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).toISOString();
+    const inicioMes  = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString();
+
+    // Vendas de hoje
+    const { data: vHoje } = await sb.from('sales').select('sale_price, net_profit').gte('sold_at', inicioHoje);
+    document.getElementById('vendasHoje').textContent = vHoje?.length || 0;
+    document.getElementById('faturamentoHoje').textContent = formatBRL(vHoje?.reduce((a, v) => a + Number(v.sale_price), 0));
+    document.getElementById('lucroHoje').textContent = formatBRL(vHoje?.reduce((a, v) => a + Number(v.net_profit), 0));
+
+    // Vendas do mês
+    const { data: vMes } = await sb.from('sales').select('sale_price, net_profit').gte('sold_at', inicioMes);
+    document.getElementById('vendasMes').textContent = vMes?.length || 0;
+    document.getElementById('faturamentoMes').textContent = formatBRL(vMes?.reduce((a, v) => a + Number(v.sale_price), 0));
+    document.getElementById('lucroMes').textContent = formatBRL(vMes?.reduce((a, v) => a + Number(v.net_profit), 0));
+
+    // Últimas vendas
+    const { data: ultimas } = await sb.from('sales')
+      .select('product_name, sale_price, status, customers(name)')
+      .order('sold_at', { ascending: false })
+      .limit(5);
+
+    if (ultimas?.length) {
+      document.getElementById('ultimasVendas').innerHTML = ultimas.map(v => `
+        <tr>
+          <td>${v.product_name}</td>
+          <td>${v.customers?.name || '—'}</td>
+          <td>${formatBRL(v.sale_price)}</td>
+          <td>${statusBadge(v.status)}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Top parceiros
+    const { data: vendas } = await sb.from('sales')
+      .select('commission_value, partners(name)')
+      .not('partner_id', 'is', null)
+      .gte('sold_at', inicioMes);
+
+    if (vendas?.length) {
+      const parcMap = {};
+      vendas.forEach(v => {
+        const n = v.partners?.name || '—';
+        if (!parcMap[n]) parcMap[n] = { vendas: 0, comissao: 0 };
+        parcMap[n].vendas++;
+        parcMap[n].comissao += Number(v.commission_value || 0);
+      });
+      const sorted = Object.entries(parcMap).sort((a,b) => b[1].vendas - a[1].vendas).slice(0, 5);
+      document.getElementById('topParceiros').innerHTML = sorted.map(([nome, d]) => `
+        <tr>
+          <td>${nome}</td>
+          <td>${d.vendas}</td>
+          <td>${formatBRL(d.comissao)}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Estoque disponível
+    const { data: estoque } = await sb.from('inventory')
+      .select('products(model, storage, color)')
+      .eq('status', 'disponivel');
+
+    if (estoque?.length) {
+      const estoMap = {};
+      estoque.forEach(i => {
+        const k = `${i.products?.model} ${i.products?.storage || ''} ${i.products?.color || ''}`.trim();
+        estoMap[k] = (estoMap[k] || 0) + 1;
+      });
+      document.getElementById('estoqueResumo').innerHTML = Object.entries(estoMap)
+        .sort((a,b) => b[1]-a[1])
+        .slice(0, 6)
+        .map(([nome, qtd]) => `<tr><td>${nome}</td><td>${qtd}</td></tr>`)
+        .join('');
+    }
+  }
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>
