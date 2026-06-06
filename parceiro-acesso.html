@@ -285,10 +285,13 @@
 
     parceiroEmail = data.email;
 
-    // Envia OTP
+    // Envia magic link
     const { error: otpErr } = await sb.auth.signInWithOtp({
       email: parceiroEmail,
-      options: { shouldCreateUser: true }
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: 'https://gaeta-prime-admin.vercel.app/parceiro-painel.html'
+      }
     });
 
     if (otpErr) {
