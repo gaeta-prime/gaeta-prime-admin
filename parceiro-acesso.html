@@ -216,17 +216,15 @@
     <div class="error-msg" id="erroCodigo"></div>
   </div>
 
-  <!-- STEP 2: OTP -->
+  <!-- STEP 2: aguarda magic link -->
   <div id="step2" style="display:none">
-    <p class="step-title" id="step2Msg">Enviamos um código de 6 dígitos para o seu e-mail.</p>
+    <p class="step-title" id="step2Msg">Enviamos um link de acesso para o seu e-mail. Clique no link para entrar no portal.</p>
 
-    <div class="field">
-      <label>Código de verificação</label>
-      <input type="text" id="otp" placeholder="000000" maxlength="6"
-        oninput="this.value = this.value.replace(/\D/g,'')">
+    <div style="text-align:center;padding:24px 0;">
+      <div style="font-size:32px;margin-bottom:12px;">✉</div>
+      <p style="font-size:12px;color:var(--muted);line-height:1.7;">Verifique sua caixa de entrada e a pasta de spam. O link expira em 1 hora.</p>
     </div>
 
-    <button class="btn" id="btnOtp" onclick="verificarOtp()">Entrar</button>
     <div class="error-msg" id="erroOtp"></div>
     <div class="success-msg" id="successOtp"></div>
     <div class="back-link" onclick="voltarStep1()">← Usar outro código</div>

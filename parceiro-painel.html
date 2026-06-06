@@ -338,22 +338,38 @@
   function formatDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('pt-BR'); }
 
   async function init() {
-    // Aguarda sessão — necessário após redirect de OTP
-    const { data: { session } } = await sb.auth.getSession();
+    // Captura sessão do magic link (hash na URL)
+    const { data: { session: sessionHash }, error: hashError } = await sb.auth.getSession();
 
-    if (session) {
-      await carregarParceiro(session);
+    // Tenta pegar sessão do hash da URL (magic link redirect)
+    if (window.location.hash) {
+      const { data, error } = await sb.auth.exchangeCodeForSession(window.location.search);
+      if (data?.session) {
+        await carregarParceiro(data.session);
+        return;
+      }
+    }
+
+    if (sessionHash) {
+      await carregarParceiro(sessionHash);
       return;
     }
 
-    // Se não tem sessão ainda, aguarda o evento de auth
+    // Aguarda evento de auth (magic link)
     sb.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
+      if (event === 'SIGNED_IN' && session) {
         await carregarParceiro(session);
-      } else {
+      } else if (!session) {
         window.location.href = 'parceiro-acesso.html';
       }
     });
+
+    // Timeout — se não logar em 5 segundos, redireciona
+    setTimeout(() => {
+      sb.auth.getSession().then(({ data }) => {
+        if (!data.session) window.location.href = 'parceiro-acesso.html';
+      });
+    }, 5000);
   }
 
   async function carregarParceiro(session) {
