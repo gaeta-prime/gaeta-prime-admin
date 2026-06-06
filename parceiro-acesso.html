@@ -335,7 +335,10 @@
 
     suc.textContent = 'Acesso confirmado! Redirecionando...';
     suc.style.display = 'block';
-    setTimeout(() => window.location.href = 'parceiro-painel.html', 1200);
+
+    // Aguarda sessão ser estabelecida antes de redirecionar
+    await new Promise(r => setTimeout(r, 1500));
+    window.location.replace('parceiro-painel.html');
   }
 
   function voltarStep1() {

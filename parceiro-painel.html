@@ -338,12 +338,27 @@
   function formatDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('pt-BR'); }
 
   async function init() {
+    // Aguarda sessão — necessário após redirect de OTP
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = 'parceiro-acesso.html'; return; }
 
+    if (session) {
+      await carregarParceiro(session);
+      return;
+    }
+
+    // Se não tem sessão ainda, aguarda o evento de auth
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        await carregarParceiro(session);
+      } else {
+        window.location.href = 'parceiro-acesso.html';
+      }
+    });
+  }
+
+  async function carregarParceiro(session) {
     const email = session.user.email;
 
-    // Busca parceiro pelo e-mail
     const { data, error } = await sb.from('partners')
       .select('*')
       .eq('email', email)
