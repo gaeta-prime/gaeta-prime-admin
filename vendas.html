@@ -587,12 +587,31 @@
     atualizarMensagem(v.status, v.customers?.name);
 
     const parLabel = v.partners ? `${v.partners.name} (${v.partners.code} · ${v.commission_pct}%)` : '—';
+
+    // Garantia — apenas vitrine, 90 dias
+    let garantiaHTML = '';
+    const nomeUpper = (v.product_name || '').toUpperCase();
+    const isVitrine = nomeUpper.includes('VITRINE') || v.condition === 'VITRINE';
+    if (isVitrine && v.sold_at) {
+      const dataVenda = new Date(v.sold_at);
+      const vencimento = new Date(dataVenda.getTime() + 90 * 24 * 60 * 60 * 1000);
+      const hoje = new Date();
+      const diffDias = Math.ceil((vencimento - hoje) / (24 * 60 * 60 * 1000));
+      if (diffDias > 0) {
+        garantiaHTML = `<div class="stat-row"><span class="stat-label">Garantia</span><span class="stat-val" style="color:var(--success)">Em garantia · ${diffDias} dias restantes</span></div>`;
+      } else {
+        const vencStr = vencimento.toLocaleDateString('pt-BR');
+        garantiaHTML = `<div class="stat-row"><span class="stat-label">Garantia</span><span class="stat-val" style="color:var(--danger)">Expirada em ${vencStr}</span></div>`;
+      }
+    }
+
     document.getElementById('dDetalhes').innerHTML = `
       <div class="stat-row"><span class="stat-label">Pagamento</span><span class="stat-val">${v.payment_method || '—'}</span></div>
       <div class="stat-row"><span class="stat-label">Canal</span><span class="stat-val">${v.channel || '—'}</span></div>
       <div class="stat-row"><span class="stat-label">Parceiro</span><span class="stat-val">${parLabel}</span></div>
       <div class="stat-row"><span class="stat-label">Data da venda</span><span class="stat-val">${formatDate(v.sold_at)}</span></div>
       <div class="stat-row"><span class="stat-label">Telefone cliente</span><span class="stat-val">${v.customers?.phone || '—'}</span></div>
+      ${garantiaHTML}
     `;
 
     if (v.customers?.phone) {
