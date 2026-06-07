@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta Prime — Automações</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --grafite: #1A1A18;
+    --grafite2: #242422;
+    --grafite3: #2e2e2b;
+    --grafite4: #383835;
+    --cobre: #B8955A;
+    --cobre-light: #d4ae7a;
+    --off: #F5F4F0;
+    --off2: #e8e7e3;
+    --muted: #888884;
+    --success: #4caf7d;
+    --warning: #e6a817;
+    --danger: #e05555;
+    --sidebar-w: 220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--grafite); color: var(--off); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; }
+
+  .sidebar { width: var(--sidebar-w); background: var(--grafite2); border-right: 1px solid rgba(184,149,90,0.1); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .sidebar-logo-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; }
+  .sidebar-logo-sub { font-size: 10px; color: var(--cobre); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 2px; }
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+  .nav-section { font-size: 9px; font-weight: 500; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; padding: 12px 24px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--off); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--cobre); border-left-color: var(--cobre); background: rgba(184,149,90,0.05); }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .logout-btn { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: color 0.15s; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+  .logout-btn:hover { color: var(--danger); }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+  .topbar { padding: 20px 32px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+  .topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; }
+
+  .content { padding: 28px 32px; flex: 1; }
+
+  /* CARDS ALERTA */
+  .alert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 32px; }
+  .alert-card { background: var(--grafite2); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; padding: 20px 22px; cursor: pointer; transition: border-color 0.2s; }
+  .alert-card:hover { border-color: rgba(184,149,90,0.2); }
+  .alert-card.warning { border-left: 3px solid var(--warning); }
+  .alert-card.success { border-left: 3px solid var(--success); }
+  .alert-card.cobre { border-left: 3px solid var(--cobre); }
+  .alert-label { font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .alert-val { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 400; }
+  .alert-val.warning { color: var(--warning); }
+  .alert-val.success { color: var(--success); }
+  .alert-val.cobre { color: var(--cobre); }
+  .alert-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* SEÇÕES */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; margin-top: 28px; }
+  .section-title { font-size: 11px; font-weight: 500; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; }
+
+  /* TABLE */
+  .table-wrap { background: var(--grafite2); border: 1px solid rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; padding: 12px 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  tbody td { padding: 13px 16px; font-size: 13px; color: var(--off2); border-bottom: 1px solid rgba(255,255,255,0.03); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 2px; }
+  .badge-yellow { background: rgba(230,168,23,0.15); color: var(--warning); }
+  .badge-green  { background: rgba(76,175,125,0.15);  color: var(--success); }
+  .badge-cobre  { background: rgba(184,149,90,0.15);  color: var(--cobre); }
+  .badge-grey   { background: rgba(136,136,132,0.15); color: var(--muted); }
+
+  .action-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 2px; transition: all 0.15s; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .action-btn:hover { color: var(--off); background: rgba(255,255,255,0.05); }
+  .action-btn.whatsapp { color: var(--success); border: 1px solid rgba(76,175,125,0.3); }
+  .action-btn.whatsapp:hover { background: rgba(76,175,125,0.1); }
+
+  .empty-state { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+  /* DRAWER MENSAGEM */
+  .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; }
+  .drawer-overlay.open { display: block; }
+  .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 420px; background: var(--grafite2); border-left: 1px solid rgba(184,149,90,0.15); z-index: 201; padding: 32px; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s; }
+  .drawer.open { transform: translateX(0); }
+  .drawer-close { position: absolute; top: 20px; right: 20px; background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; }
+  .drawer-close:hover { color: var(--off); }
+  .drawer-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; margin-bottom: 4px; }
+  .drawer-sub { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+  .drawer-section { font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin: 20px 0 10px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .drawer-section:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .msg-box { background: var(--grafite3); border: 1px solid rgba(255,255,255,0.07); border-radius: 2px; padding: 14px; font-size: 13px; color: var(--off2); line-height: 1.7; white-space: pre-wrap; margin-bottom: 12px; }
+  .btn-copy { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 2px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 11px; padding: 8px 16px; cursor: pointer; transition: all 0.15s; margin-right: 8px; }
+  .btn-copy:hover { color: var(--off); }
+  .btn-whatsapp { background: rgba(76,175,125,0.1); border: 1px solid rgba(76,175,125,0.3); border-radius: 2px; color: var(--success); font-family: 'DM Sans', sans-serif; font-size: 11px; padding: 8px 16px; cursor: pointer; transition: all 0.15s; }
+  .btn-whatsapp:hover { background: rgba(76,175,125,0.2); }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--grafite4); border: 1px solid rgba(184,149,90,0.3); border-radius: 2px; padding: 12px 20px; font-size: 13px; color: var(--off); z-index: 300; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(76,175,125,0.4); color: var(--success); }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-name">Gaeta Prime</div>
+    <div class="sidebar-logo-sub">Admin</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+    <a class="nav-item" href="vendas.html"><span class="nav-icon">◎</span> Vendas</a>
+    <a class="nav-item" href="estoque.html"><span class="nav-icon">◰</span> Estoque</a>
+    <a class="nav-item" href="clientes.html"><span class="nav-icon">◑</span> Clientes</a>
+    <div class="nav-section">Gestão</div>
+    <a class="nav-item" href="produtos.html"><span class="nav-icon">◇</span> Produtos</a>
+    <a class="nav-item" href="parceiros.html"><span class="nav-icon">◈</span> Parceiros</a>
+    <a class="nav-item" href="comissoes.html"><span class="nav-icon">◎</span> Comissões</a>
+    <a class="nav-item" href="lembretes.html"><span class="nav-icon">◉</span> Lembretes</a>
+    <a class="nav-item active" href="automacoes.html"><span class="nav-icon">◆</span> Automações</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="handleLogout()"><span>⊗</span> Sair</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Automações</div>
+  </div>
+
+  <div class="content">
+
+    <!-- CARDS ALERTA -->
+    <div class="alert-grid">
+      <div class="alert-card warning">
+        <div class="alert-label">Pagamento pendente há +4h</div>
+        <div class="alert-val warning" id="countPendente">—</div>
+        <div class="alert-sub">pedidos aguardando</div>
+      </div>
+      <div class="alert-card success">
+        <div class="alert-label">Pós-venda pendente</div>
+        <div class="alert-val success" id="countPosVenda">—</div>
+        <div class="alert-sub">entregues sem contato</div>
+      </div>
+      <div class="alert-card cobre">
+        <div class="alert-label">Aniversários hoje</div>
+        <div class="alert-val cobre" id="countAniversario">—</div>
+        <div class="alert-sub">clientes</div>
+      </div>
+    </div>
+
+    <!-- PAGAMENTO PENDENTE -->
+    <div class="section-header">
+      <span class="section-title">Pagamento pendente há mais de 4 horas</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Valor</th>
+            <th>Pendente há</th>
+            <th>Telefone</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="pendentesBody">
+          <tr><td colspan="6" class="empty-state">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PÓS-VENDA -->
+    <div class="section-header">
+      <span class="section-title">Pós-venda — entregues sem contato</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Produto</th>
+            <th>Entregue em</th>
+            <th>Telefone</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="posVendaBody">
+          <tr><td colspan="5" class="empty-state">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ANIVERSÁRIOS -->
+    <div class="section-header">
+      <span class="section-title">Aniversários hoje</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Telefone</th>
+            <th>Compras</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="aniversarioBody">
+          <tr><td colspan="4" class="empty-state">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</main>
+
+<!-- DRAWER MENSAGEM -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  <div class="drawer-title" id="drawerTitulo">—</div>
+  <div class="drawer-sub" id="drawerSub">—</div>
+  <div class="drawer-section">Mensagem</div>
+  <div class="msg-box" id="drawerMsg">—</div>
+  <button class="btn-copy" onclick="copiar()">Copiar</button>
+  <button class="btn-whatsapp" onclick="enviarWpp()">Enviar WhatsApp</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  sb.auth.getSession().then(({ data }) => {
+    if (!data.session) window.location.href = 'login.html';
+  });
+
+  let drawerPhone = '';
+
+  function formatBRL(v) { return 'R$ ' + Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2}); }
+  function formatDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('pt-BR'); }
+
+  function tempoDecorrido(data) {
+    const diff = Date.now() - new Date(data).getTime();
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    if (h >= 24) return `${Math.floor(h/24)}d ${h%24}h`;
+    return `${h}h ${m}min`;
+  }
+
+  async function loadAll() {
+    const agora = new Date();
+    const limite4h = new Date(agora.getTime() - 4 * 60 * 60 * 1000).toISOString();
+    const hoje = `${String(agora.getMonth()+1).padStart(2,'0')}-${String(agora.getDate()).padStart(2,'0')}`;
+
+    const [vendas, clientes] = await Promise.all([
+      sb.from('sales').select('*, customers(name, phone)').order('sold_at', { ascending: false }),
+      sb.from('customers').select('*'),
+    ]);
+
+    const todasVendas = vendas.data || [];
+    const todosClientes = clientes.data || [];
+
+    // PENDENTES +4h
+    const pendentes = todasVendas.filter(v =>
+      v.status === 'pagamento_pendente' &&
+      new Date(v.sold_at) <= new Date(limite4h)
+    );
+    document.getElementById('countPendente').textContent = pendentes.length;
+
+    const tbPend = document.getElementById('pendentesBody');
+    if (!pendentes.length) {
+      tbPend.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum pedido pendente há mais de 4h</td></tr>';
+    } else {
+      tbPend.innerHTML = pendentes.map(v => `<tr>
+        <td>${v.customers?.name || '—'}</td>
+        <td style="font-size:12px">${v.product_name}</td>
+        <td style="color:var(--cobre)">${formatBRL(v.sale_price)}</td>
+        <td><span class="badge badge-yellow">${tempoDecorrido(v.sold_at)}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${v.customers?.phone || '—'}</td>
+        <td><button class="action-btn whatsapp" onclick="abrirMensagem('lembrete', ${JSON.stringify(v)})">Lembrar</button></td>
+      </tr>`).join('');
+    }
+
+    // PÓS-VENDA
+    const posVenda = todasVendas.filter(v => v.status === 'entregue');
+    document.getElementById('countPosVenda').textContent = posVenda.length;
+
+    const tbPos = document.getElementById('posVendaBody');
+    if (!posVenda.length) {
+      tbPos.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum pós-venda pendente</td></tr>';
+    } else {
+      tbPos.innerHTML = posVenda.map(v => `<tr>
+        <td>${v.customers?.name || '—'}</td>
+        <td style="font-size:12px">${v.product_name}</td>
+        <td style="font-size:12px;color:var(--muted)">${formatDate(v.sold_at)}</td>
+        <td style="font-size:12px;color:var(--muted)">${v.customers?.phone || '—'}</td>
+        <td><button class="action-btn whatsapp" onclick="abrirMensagem('posvenda', ${JSON.stringify(v)})">Pós-venda</button></td>
+      </tr>`).join('');
+    }
+
+    // ANIVERSÁRIOS HOJE
+    const aniversariantes = todosClientes.filter(c => {
+      if (!c.birth_date) return false;
+      const d = new Date(c.birth_date);
+      const mmdd = `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      return mmdd === hoje;
+    });
+    document.getElementById('countAniversario').textContent = aniversariantes.length;
+
+    const tbAniv = document.getElementById('aniversarioBody');
+    if (!aniversariantes.length) {
+      tbAniv.innerHTML = '<tr><td colspan="4" class="empty-state">Nenhum aniversariante hoje</td></tr>';
+    } else {
+      tbAniv.innerHTML = aniversariantes.map(c => {
+        const compras = todasVendas.filter(v => v.customer_id === c.id).length;
+        return `<tr>
+          <td><strong>${c.name}</strong></td>
+          <td style="font-size:12px;color:var(--muted)">${c.phone || '—'}</td>
+          <td><span class="badge badge-cobre">${compras}</span></td>
+          <td><button class="action-btn whatsapp" onclick="abrirMensagemAniv(${JSON.stringify(c)})">Parabenizar</button></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  function abrirMensagem(tipo, venda) {
+    const nome = venda.customers?.name?.split(' ')[0] || 'cliente';
+    drawerPhone = venda.customers?.phone || '';
+
+    if (tipo === 'lembrete') {
+      document.getElementById('drawerTitulo').textContent = 'Lembrete de pagamento';
+      document.getElementById('drawerSub').textContent = `${venda.customers?.name || '—'} · ${venda.product_name}`;
+      document.getElementById('drawerMsg').textContent =
+        `Olá, ${nome}! Tudo bem? Passando para lembrar que o pagamento do seu ${venda.product_name} ainda está pendente. Qualquer dúvida, estou à disposição!`;
+    } else {
+      document.getElementById('drawerTitulo').textContent = 'Pós-venda';
+      document.getElementById('drawerSub').textContent = `${venda.customers?.name || '—'} · ${venda.product_name}`;
+      document.getElementById('drawerMsg').textContent =
+        `Olá, ${nome}! Tudo bem com seu ${venda.product_name}? Espero que esteja aproveitando muito! Se precisar de qualquer coisa, pode contar comigo. E se tiver gostado da experiência, ficaria feliz com uma indicação para amigos e familiares. Obrigado pela confiança na Gaeta Prime!`;
+    }
+
+    document.getElementById('drawerOverlay').classList.add('open');
+    document.getElementById('drawer').classList.add('open');
+  }
+
+  function abrirMensagemAniv(cliente) {
+    const nome = cliente.name?.split(' ')[0] || 'cliente';
+    drawerPhone = cliente.phone || '';
+    document.getElementById('drawerTitulo').textContent = 'Feliz aniversário!';
+    document.getElementById('drawerSub').textContent = cliente.name;
+    document.getElementById('drawerMsg').textContent =
+      `Olá, ${nome}! A Gaeta Prime veio te desejar um feliz aniversário! Que seu dia seja incrível e que o próximo ano traga muito sucesso. Conte sempre com a gente!`;
+    document.getElementById('drawerOverlay').classList.add('open');
+    document.getElementById('drawer').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawerOverlay').classList.remove('open');
+    document.getElementById('drawer').classList.remove('open');
+  }
+
+  function copiar() {
+    const msg = document.getElementById('drawerMsg').textContent;
+    navigator.clipboard.writeText(msg).then(() => showToast('Mensagem copiada', 'success'));
+  }
+
+  function enviarWpp() {
+    if (!drawerPhone) { showToast('Telefone não cadastrado', ''); return; }
+    const num = drawerPhone.replace(/\D/g, '');
+    const full = num.startsWith('55') ? num : '55' + num;
+    const msg = encodeURIComponent(document.getElementById('drawerMsg').textContent);
+    window.open(`https://wa.me/${full}?text=${msg}`, '_blank');
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  loadAll();
+</script>
+</body>
+</html>
