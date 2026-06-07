@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaeta Prime — Lembretes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --grafite: #1A1A18;
+    --grafite2: #242422;
+    --grafite3: #2e2e2b;
+    --grafite4: #383835;
+    --cobre: #B8955A;
+    --cobre-light: #d4ae7a;
+    --off: #F5F4F0;
+    --off2: #e8e7e3;
+    --muted: #888884;
+    --success: #4caf7d;
+    --warning: #e6a817;
+    --danger: #e05555;
+    --sidebar-w: 220px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--grafite); color: var(--off); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; }
+
+  .sidebar { width: var(--sidebar-w); background: var(--grafite2); border-right: 1px solid rgba(184,149,90,0.1); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .sidebar-logo { padding: 28px 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .sidebar-logo-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; }
+  .sidebar-logo-sub { font-size: 10px; color: var(--cobre); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 2px; }
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+  .nav-section { font-size: 9px; font-weight: 500; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; padding: 12px 24px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 24px; font-size: 13px; color: var(--muted); cursor: pointer; transition: all 0.15s; text-decoration: none; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--off); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--cobre); border-left-color: var(--cobre); background: rgba(184,149,90,0.05); }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.05); }
+  .logout-btn { font-size: 12px; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: color 0.15s; background: none; border: none; font-family: 'DM Sans', sans-serif; }
+  .logout-btn:hover { color: var(--danger); }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+  .topbar { padding: 20px 32px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+  .topbar-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 300; }
+
+  .btn-primary { background: var(--cobre); color: var(--grafite); border: none; border-radius: 2px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 10px 20px; cursor: pointer; transition: background 0.15s; }
+  .btn-primary:hover { background: var(--cobre-light); }
+
+  .content { padding: 28px 32px; flex: 1; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 2px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .tab { font-size: 12px; font-weight: 500; color: var(--muted); padding: 10px 20px; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+  .tab:hover { color: var(--off); }
+  .tab.active { color: var(--cobre); border-bottom-color: var(--cobre); }
+
+  /* LEMBRETES */
+  .lembrete-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .lembrete-card {
+    background: var(--grafite2);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 2px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.15s;
+  }
+
+  .lembrete-card:hover { border-color: rgba(184,149,90,0.15); }
+  .lembrete-card.hoje { border-left: 3px solid var(--warning); }
+  .lembrete-card.atrasado { border-left: 3px solid var(--danger); }
+  .lembrete-card.futuro { border-left: 3px solid var(--muted); }
+  .lembrete-card.concluido { opacity: 0.4; }
+
+  .lembrete-data { text-align: center; min-width: 52px; }
+  .lembrete-dia { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; line-height: 1; }
+  .lembrete-mes { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .lembrete-info { flex: 1; }
+  .lembrete-titulo { font-size: 14px; font-weight: 500; color: var(--off); margin-bottom: 3px; }
+  .lembrete-desc { font-size: 12px; color: var(--muted); }
+
+  .lembrete-badge { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 2px; white-space: nowrap; }
+  .badge-hoje { background: rgba(230,168,23,0.15); color: var(--warning); }
+  .badge-atrasado { background: rgba(224,85,85,0.15); color: var(--danger); }
+  .badge-futuro { background: rgba(136,136,132,0.15); color: var(--muted); }
+  .badge-concluido { background: rgba(76,175,125,0.15); color: var(--success); }
+
+  .lembrete-actions { display: flex; gap: 6px; }
+  .action-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 12px; padding: 4px 8px; border-radius: 2px; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .action-btn:hover { color: var(--off); background: rgba(255,255,255,0.05); }
+  .action-btn.check { color: var(--success); border: 1px solid rgba(76,175,125,0.3); }
+  .action-btn.check:hover { background: rgba(76,175,125,0.1); }
+  .action-btn.danger:hover { color: var(--danger); }
+
+  .empty-state { text-align: center; padding: 48px; color: var(--muted); font-size: 13px; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--grafite2); border: 1px solid rgba(184,149,90,0.2); border-radius: 2px; width: 100%; max-width: 460px; padding: 32px; }
+  .modal-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; margin-bottom: 24px; }
+
+  .form-group { margin-bottom: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  label { display: block; font-size: 10px; font-weight: 500; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  input, select, textarea { width: 100%; background: var(--grafite3); border: 1px solid rgba(255,255,255,0.07); border-radius: 2px; color: var(--off); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px 12px; outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: rgba(184,149,90,0.4); }
+  textarea { resize: vertical; min-height: 70px; }
+  select option { background: var(--grafite3); }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 2px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 20px; cursor: pointer; }
+  .btn-cancel:hover { color: var(--off); }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--grafite4); border: 1px solid rgba(184,149,90,0.3); border-radius: 2px; padding: 12px 20px; font-size: 13px; color: var(--off); z-index: 300; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(76,175,125,0.4); color: var(--success); }
+  .toast.error { border-color: rgba(224,85,85,0.4); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-name">Gaeta Prime</div>
+    <div class="sidebar-logo-sub">Admin</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <a class="nav-item" href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+    <a class="nav-item" href="vendas.html"><span class="nav-icon">◎</span> Vendas</a>
+    <a class="nav-item" href="estoque.html"><span class="nav-icon">◰</span> Estoque</a>
+    <a class="nav-item" href="clientes.html"><span class="nav-icon">◑</span> Clientes</a>
+    <div class="nav-section">Gestão</div>
+    <a class="nav-item" href="produtos.html"><span class="nav-icon">◇</span> Produtos</a>
+    <a class="nav-item" href="parceiros.html"><span class="nav-icon">◈</span> Parceiros</a>
+    <a class="nav-item" href="comissoes.html"><span class="nav-icon">◎</span> Comissões</a>
+    <a class="nav-item active" href="lembretes.html"><span class="nav-icon">◉</span> Lembretes</a>
+    <a class="nav-item" href="automacoes.html"><span class="nav-icon">◆</span> Automações</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="handleLogout()"><span>⊗</span> Sair</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">Lembretes</div>
+    <button class="btn-primary" onclick="openModal()">+ Novo Lembrete</button>
+  </div>
+
+  <div class="content">
+    <div class="tabs">
+      <div class="tab active" onclick="trocarTab('pendentes', this)">Pendentes</div>
+      <div class="tab" onclick="trocarTab('concluidos', this)">Concluídos</div>
+      <div class="tab" onclick="trocarTab('todos', this)">Todos</div>
+    </div>
+
+    <div class="lembrete-list" id="lembreteList">
+      <div class="empty-state">Carregando...</div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Novo Lembrete</div>
+    <input type="hidden" id="editId">
+
+    <div class="form-group">
+      <label>Título</label>
+      <input type="text" id="titulo" placeholder="ex: Ligar para cliente, Pagar comissão...">
+    </div>
+
+    <div class="form-group">
+      <label>Descrição (opcional)</label>
+      <textarea id="descricao" placeholder="Mais detalhes sobre o lembrete..."></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="dataLembrete">
+      </div>
+      <div class="form-group">
+        <label>Horário (opcional)</label>
+        <input type="time" id="horaLembrete">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Prioridade</label>
+      <select id="prioridade">
+        <option value="normal">Normal</option>
+        <option value="alta">Alta</option>
+        <option value="urgente">Urgente</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" onclick="salvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = 'https://zdnnbxkewbmedtidoxyd.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpkbm5ieGtld2JtZWR0aWRveHlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2MDU1NTIsImV4cCI6MjA5NjE4MTU1Mn0.npq4b4do5qJvhHWlO0v3-eKWC-PxdGikMYpGYKkWmTA';
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  sb.auth.getSession().then(({ data }) => {
+    if (!data.session) window.location.href = 'login.html';
+  });
+
+  let todosLembretes = [];
+  let tabAtiva = 'pendentes';
+
+  function formatDate(d) {
+    if (!d) return '—';
+    const dt = new Date(d + 'T00:00:00');
+    return dt.toLocaleDateString('pt-BR');
+  }
+
+  function getDia(d) { return new Date(d + 'T00:00:00').getDate(); }
+  function getMes(d) {
+    const meses = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+    return meses[new Date(d + 'T00:00:00').getMonth()];
+  }
+
+  function statusLembrete(l) {
+    if (l.concluido) return 'concluido';
+    const hoje = new Date().toISOString().split('T')[0];
+    if (l.data < hoje) return 'atrasado';
+    if (l.data === hoje) return 'hoje';
+    return 'futuro';
+  }
+
+  function badgeLabel(status) {
+    const map = { hoje: 'Hoje', atrasado: 'Atrasado', futuro: 'Agendado', concluido: 'Concluído' };
+    return map[status] || status;
+  }
+
+  function badgeClass(status) {
+    const map = { hoje: 'badge-hoje', atrasado: 'badge-atrasado', futuro: 'badge-futuro', concluido: 'badge-concluido' };
+    return map[status] || '';
+  }
+
+  async function loadLembretes() {
+    const { data, error } = await sb.from('reminders').select('*').order('data').order('hora');
+    if (error) {
+      // Tabela ainda não existe
+      document.getElementById('lembreteList').innerHTML = '<div class="empty-state">Nenhum lembrete ainda. Crie o primeiro!</div>';
+      return;
+    }
+    todosLembretes = data || [];
+    renderLembretes();
+  }
+
+  function trocarTab(tab, el) {
+    tabAtiva = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderLembretes();
+  }
+
+  function renderLembretes() {
+    let lista = todosLembretes;
+    if (tabAtiva === 'pendentes') lista = lista.filter(l => !l.concluido);
+    if (tabAtiva === 'concluidos') lista = lista.filter(l => l.concluido);
+
+    const el = document.getElementById('lembreteList');
+    if (!lista.length) {
+      el.innerHTML = '<div class="empty-state">Nenhum lembrete encontrado</div>';
+      return;
+    }
+
+    el.innerHTML = lista.map(l => {
+      const status = statusLembrete(l);
+      return `
+        <div class="lembrete-card ${status}${l.concluido?' concluido':''}">
+          <div class="lembrete-data">
+            <div class="lembrete-dia" style="color:${status==='atrasado'?'var(--danger)':status==='hoje'?'var(--warning)':'var(--off)'}">${getDia(l.data)}</div>
+            <div class="lembrete-mes">${getMes(l.data)}</div>
+          </div>
+          <div class="lembrete-info">
+            <div class="lembrete-titulo">${l.titulo}</div>
+            <div class="lembrete-desc">${[l.descricao, l.hora ? l.hora.slice(0,5) : null, l.prioridade !== 'normal' ? l.prioridade.toUpperCase() : null].filter(Boolean).join(' · ')}</div>
+          </div>
+          <span class="lembrete-badge ${badgeClass(status)}">${badgeLabel(status)}</span>
+          <div class="lembrete-actions">
+            ${!l.concluido ? `<button class="action-btn check" onclick="concluir('${l.id}')">✓ Feito</button>` : ''}
+            <button class="action-btn" onclick='editarLembrete(${JSON.stringify(l)})'>Editar</button>
+            <button class="action-btn danger" onclick="deletar('${l.id}')">Excluir</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openModal() {
+    document.getElementById('editId').value = '';
+    document.getElementById('modalTitle').textContent = 'Novo Lembrete';
+    document.getElementById('titulo').value = '';
+    document.getElementById('descricao').value = '';
+    document.getElementById('dataLembrete').value = new Date().toISOString().split('T')[0];
+    document.getElementById('horaLembrete').value = '';
+    document.getElementById('prioridade').value = 'normal';
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function editarLembrete(l) {
+    document.getElementById('editId').value = l.id;
+    document.getElementById('modalTitle').textContent = 'Editar Lembrete';
+    document.getElementById('titulo').value = l.titulo || '';
+    document.getElementById('descricao').value = l.descricao || '';
+    document.getElementById('dataLembrete').value = l.data || '';
+    document.getElementById('horaLembrete').value = l.hora ? l.hora.slice(0,5) : '';
+    document.getElementById('prioridade').value = l.prioridade || 'normal';
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+
+  async function salvar() {
+    const id = document.getElementById('editId').value;
+    const titulo = document.getElementById('titulo').value.trim();
+    if (!titulo) { showToast('Informe o título', 'error'); return; }
+
+    const dados = {
+      titulo,
+      descricao:  document.getElementById('descricao').value.trim() || null,
+      data:       document.getElementById('dataLembrete').value,
+      hora:       document.getElementById('horaLembrete').value || null,
+      prioridade: document.getElementById('prioridade').value,
+      concluido:  false,
+    };
+
+    let error;
+    if (id) {
+      ({ error } = await sb.from('reminders').update(dados).eq('id', id));
+    } else {
+      ({ error } = await sb.from('reminders').insert(dados));
+    }
+
+    if (error) { showToast('Erro: ' + error.message, 'error'); return; }
+    showToast(id ? 'Lembrete atualizado' : 'Lembrete criado', 'success');
+    closeModal();
+    loadLembretes();
+  }
+
+  async function concluir(id) {
+    const { error } = await sb.from('reminders').update({ concluido: true }).eq('id', id);
+    if (error) { showToast('Erro', 'error'); return; }
+    showToast('Marcado como concluído', 'success');
+    loadLembretes();
+  }
+
+  async function deletar(id) {
+    if (!confirm('Excluir este lembrete?')) return;
+    const { error } = await sb.from('reminders').delete().eq('id', id);
+    if (error) { showToast('Erro', 'error'); return; }
+    showToast('Lembrete excluído', 'success');
+    loadLembretes();
+  }
+
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + type;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+
+  async function handleLogout() {
+    await sb.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  loadLembretes();
+</script>
+</body>
+</html>
