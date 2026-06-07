@@ -296,6 +296,28 @@
     gap: 16px;
   }
 
+  .alerta-item {
+    background: var(--grafite2);
+    border-radius: 2px;
+    padding: 12px 16px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--off2);
+    border: 1px solid rgba(255,255,255,0.05);
+    transition: border-color 0.15s;
+  }
+  .alerta-item:hover { border-color: rgba(184,149,90,0.2); }
+  .alerta-item.warning { border-left: 3px solid var(--warning); }
+  .alerta-item.cobre { border-left: 3px solid var(--cobre); }
+  .alerta-item.danger { border-left: 3px solid var(--danger); }
+  .alerta-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .alerta-dot.warning { background: var(--warning); }
+  .alerta-dot.cobre { background: var(--cobre); }
+  .alerta-dot.danger { background: var(--danger); }
+
   .loading { color: var(--muted); font-size: 13px; }
 </style>
 </head>
@@ -308,31 +330,18 @@
     <div class="sidebar-logo-sub">Admin</div>
   </div>
 
-  <nav class="sidebar-nav">
+    <nav class="sidebar-nav">
     <div class="nav-section">Principal</div>
-    <a class="nav-item active" href="dashboard.html">
-      <span class="nav-icon">◈</span> Dashboard
-    </a>
-    <a class="nav-item" href="vendas.html">
-      <span class="nav-icon">◎</span> Vendas
-    </a>
-    <a class="nav-item" href="estoque.html">
-      <span class="nav-icon">◰</span> Estoque
-    </a>
-    <a class="nav-item" href="clientes.html">
-      <span class="nav-icon">◑</span> Clientes
-    </a>
-
+    <a class="nav-item active" href="dashboard.html"><span class="nav-icon">◈</span> Dashboard</a>
+    <a class="nav-item" href="vendas.html"><span class="nav-icon">◎</span> Vendas</a>
+    <a class="nav-item" href="estoque.html"><span class="nav-icon">◰</span> Estoque</a>
+    <a class="nav-item" href="clientes.html"><span class="nav-icon">◑</span> Clientes</a>
     <div class="nav-section">Gestão</div>
-    <a class="nav-item" href="produtos.html">
-      <span class="nav-icon">◇</span> Produtos
-    </a>
-    <a class="nav-item" href="parceiros.html">
-      <span class="nav-icon">◈</span> Parceiros
-    </a>
-    <a class="nav-item" href="comissoes.html">
-      <span class="nav-icon">◎</span> Comissões
-    </a>
+    <a class="nav-item" href="produtos.html"><span class="nav-icon">◇</span> Produtos</a>
+    <a class="nav-item" href="parceiros.html"><span class="nav-icon">◈</span> Parceiros</a>
+    <a class="nav-item" href="comissoes.html"><span class="nav-icon">◎</span> Comissões</a>
+    <a class="nav-item" href="lembretes.html"><span class="nav-icon">◉</span> Lembretes</a>
+    <a class="nav-item" href="automacoes.html"><span class="nav-icon">◆</span> Automações</a>
   </nav>
 
   <div class="sidebar-footer">
@@ -399,6 +408,14 @@
         <div class="card-value success" id="lucroMes">—</div>
         <div class="card-sub">lucro líquido</div>
       </div>
+    </div>
+
+    <!-- ALERTAS DO DIA -->
+    <div id="alertasDia" style="margin-bottom:28px;display:none">
+      <div class="section-header">
+        <span class="section-title">Alertas do dia</span>
+      </div>
+      <div id="alertasLista" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
 
     <!-- ÚLTIMAS VENDAS + TOP PARCEIROS -->
@@ -504,6 +521,49 @@
     return `<span class="badge ${cls}">${label}</span>`;
   }
 
+  async function loadAlertas() {
+    const hoje = new Date().toISOString().split('T')[0];
+    const hojeMMDD = hoje.slice(5);
+    const limite4h = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+
+    const [lembretes, vendas, clientes] = await Promise.all([
+      sb.from('reminders').select('*').eq('data', hoje).eq('concluido', false),
+      sb.from('sales').select('*, customers(name)').eq('status', 'pagamento_pendente').lte('sold_at', limite4h),
+      sb.from('customers').select('name, phone, birth_date').not('birth_date', 'is', null),
+    ]);
+
+    const alertas = [];
+
+    // Lembretes do dia
+    (lembretes.data || []).forEach(l => {
+      alertas.push({ tipo: 'cobre', texto: `Lembrete: ${l.titulo}`, link: 'lembretes.html' });
+    });
+
+    // Pagamentos pendentes +4h
+    (vendas.data || []).forEach(v => {
+      alertas.push({ tipo: 'warning', texto: `Pagamento pendente: ${v.customers?.name || '—'} — ${v.product_name}`, link: 'automacoes.html' });
+    });
+
+    // Aniversariantes
+    (clientes.data || []).forEach(c => {
+      if (!c.birth_date) return;
+      const mmdd = c.birth_date.slice(5);
+      if (mmdd === hojeMMDD) {
+        alertas.push({ tipo: 'cobre', texto: `Aniversário: ${c.name}`, link: 'automacoes.html' });
+      }
+    });
+
+    if (!alertas.length) return;
+
+    document.getElementById('alertasDia').style.display = 'block';
+    document.getElementById('alertasLista').innerHTML = alertas.map(a => `
+      <a href="${a.link}" class="alerta-item ${a.tipo}">
+        <span class="alerta-dot ${a.tipo}"></span>
+        ${a.texto}
+      </a>
+    `).join('');
+  }
+
   async function loadDashboard() {
     const hoje = new Date();
     const inicioHoje = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()).toISOString();
@@ -587,6 +647,7 @@
   }
 
   loadDashboard();
+  loadAlertas();
 </script>
 </body>
 </html>
