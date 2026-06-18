@@ -487,7 +487,7 @@
     const selPar = document.getElementById('partnerId');
     selPar.innerHTML = '<option value="">Sem parceiro</option>';
     parceiros.forEach(p => {
-      selPar.innerHTML += `<option value="${p.id}" data-pct="${p.commission_pct}">${p.name} (${p.commission_pct}%)</option>`;
+      selPar.innerHTML += `<option value="${p.id}">${p.name}</option>`;
     });
 
     const selStatus = document.getElementById('dStatusSelect');
