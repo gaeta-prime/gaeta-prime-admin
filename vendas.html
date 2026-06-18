@@ -776,10 +776,16 @@
       ${garantiaHTML}
     `;
 
-    if (v.customers?.phone) {
-      document.getElementById('btnWhatsApp').style.display = 'inline-block';
+    const phone = v.customers?.phone;
+    const btnWpp = document.getElementById('btnWhatsApp');
+    if (phone) {
+      btnWpp.style.display = 'inline-block';
+      btnWpp.style.opacity = '1';
+      btnWpp.title = '';
     } else {
-      document.getElementById('btnWhatsApp').style.display = 'none';
+      btnWpp.style.display = 'inline-block';
+      btnWpp.style.opacity = '0.4';
+      btnWpp.title = 'Telefone não cadastrado para este cliente';
     }
 
     document.getElementById('drawerOverlay').classList.add('open');
@@ -788,7 +794,7 @@
 
   function atualizarMensagem(status, nomeCliente) {
     let msg = statusMsgs[status] || '—';
-    if (nomeCliente) msg = `Olá, ${nomeCliente}! ` + msg;
+    if (nomeCliente) msg = `Olá, ${nomeCliente.split(' ')[0]}! ` + msg;
     document.getElementById('dMensagem').textContent = msg;
   }
 
