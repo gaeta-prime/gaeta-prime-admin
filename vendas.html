@@ -399,7 +399,7 @@
   <div id="dFinanceiro"></div>
 
   <div class="drawer-section">Status do pedido</div>
-  <select class="status-select" id="dStatusSelect" onchange="atualizarStatus()"></select>
+  <select class="status-select" id="dStatusSelect" onchange="atualizarStatus(this.value)"></select>
 
   <div class="drawer-section">Mensagem automática</div>
   <div class="msg-box" id="dMensagem">—</div>
@@ -852,9 +852,9 @@
     document.getElementById('dMensagem').textContent = msg;
   }
 
-  async function atualizarStatus() {
+  async function atualizarStatus(novoStatus) {
     if (!vendaAtiva) return;
-    const novoStatus = document.getElementById('dStatusSelect').value;
+    if (novoStatus === vendaAtiva.status) return; // Não faz nada se não mudou
 
     const { error } = await sb.from('sales').update({ status: novoStatus }).eq('id', vendaAtiva.id);
     if (error) { showToast('Erro ao atualizar status', 'error'); return; }
@@ -868,7 +868,11 @@
     vendaAtiva.status = novoStatus;
     atualizarMensagem(novoStatus, vendaAtiva.customers?.name);
     showToast('Status atualizado', 'success');
-    loadAll();
+
+    // Atualiza a lista sem fechar o drawer
+    const { data } = await sb.from('sales').select('*, customers(name, phone), partners(name, code, commission_pct)').order('sold_at', { ascending: false });
+    todasVendas = data || [];
+    renderVendas();
   }
 
   function copiarMensagem() {
