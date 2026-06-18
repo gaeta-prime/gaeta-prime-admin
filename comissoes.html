@@ -363,11 +363,13 @@
   }
 
   function calcCards() {
-    const totalGerado = vendas.filter(v => v.status !== 'cancelado')
+    // Total gerado = todas as vendas finalizadas com parceiro
+    const totalGerado = vendas.filter(v => v.status === 'finalizado')
       .reduce((a,v) => a + Number(v.commission_value||0), 0);
-    const pendente = vendas.filter(v => !['finalizado','cancelado'].includes(v.status))
-      .reduce((a,v) => a + Number(v.commission_value||0), 0);
+    // Já pago = soma dos pagamentos registrados
     const pago = pagamentos.reduce((a,p) => a + Number(p.amount||0), 0);
+    // Pendente = total gerado menos o que já foi pago
+    const pendente = Math.max(0, totalGerado - pago);
 
     document.getElementById('totalGerado').textContent = formatBRL(totalGerado);
     document.getElementById('totalPendente').textContent = formatBRL(pendente);
@@ -392,7 +394,7 @@
   }
 
   function renderPendentes() {
-    const pendentes = vendas.filter(v => !['finalizado','cancelado'].includes(v.status));
+    const pendentes = vendas.filter(v => v.status === 'finalizado');
     const tbody = document.getElementById('pendentesBody');
     if (!pendentes.length) {
       tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Nenhuma comissão pendente</td></tr>';
@@ -438,9 +440,10 @@
     }
 
     el.innerHTML = parceiros.map(p => {
-      const pVendas = vendas.filter(v => v.partners?.id === p.id && v.status !== 'cancelado');
-      const pendente = pVendas.filter(v => v.status !== 'finalizado')
-        .reduce((a,v) => a + Number(v.commission_value||0), 0);
+      const pVendas = vendas.filter(v => v.partners?.id === p.id && v.status === 'finalizado');
+      const pago = pagamentos.filter(pg => pg.partner_id === p.id).reduce((a,pg) => a + Number(pg.amount||0), 0);
+      const totalComissao = pVendas.reduce((a,v) => a + Number(v.commission_value||0), 0);
+      const pendente = Math.max(0, totalComissao - pago);
       const totalGanho = pVendas.reduce((a,v) => a + Number(v.commission_value||0), 0);
       const jaP = pagamentos.filter(pg => pg.partner_id === p.id)
         .reduce((a,pg) => a + Number(pg.amount||0), 0);
