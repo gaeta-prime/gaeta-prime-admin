@@ -305,7 +305,7 @@
       <div class="form-row">
         <div class="form-group">
           <label>Tipo de comissão</label>
-          <select id="comissaoTipo" onchange="calcResumo()">
+          <select id="comissaoTipo" onchange="onComissaoTipoChange()">
             <option value="pct">Percentual (%)</option>
             <option value="fixo">Valor fixo (R$)</option>
           </select>
@@ -476,10 +476,26 @@
     const fields = document.getElementById('comissaoFields');
     if (parSel.value) {
       fields.style.display = 'block';
+      document.getElementById('comissaoTipo').value = 'pct';
       document.getElementById('comissaoValor').value = pct;
       document.getElementById('comissaoLabel').textContent = `(padrão: ${pct}%)`;
     } else {
       fields.style.display = 'none';
+    }
+    calcResumo();
+  }
+
+  function onComissaoTipoChange() {
+    const tipo = document.getElementById('comissaoTipo').value;
+    const label = document.getElementById('comissaoLabel');
+    const parSel = document.getElementById('partnerId');
+    const pct = parseFloat(parSel.options[parSel.selectedIndex]?.dataset?.pct) || 0;
+    if (tipo === 'pct') {
+      label.textContent = `(padrão: ${pct}%)`;
+      document.getElementById('comissaoValor').placeholder = '%';
+    } else {
+      label.textContent = '(R$)';
+      document.getElementById('comissaoValor').placeholder = '0,00';
     }
     calcResumo();
   }
