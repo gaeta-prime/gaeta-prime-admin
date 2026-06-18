@@ -609,7 +609,7 @@
   }
 
   async function loadProdutos() {
-    const { data, error } = await sb.from('products').select('*').order('category').order('model');
+    const { data, error } = await sb.from('products').select('*').order('category').order('model').order('condition').order('color');
     if (error) { showToast('Erro ao carregar produtos', 'error'); return; }
     todosProudtos = data || [];
     renderProdutos();
