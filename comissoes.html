@@ -443,7 +443,7 @@
       const pVendas = vendas.filter(v => v.partners?.id === p.id && v.status === 'finalizado');
       const pago = pagamentos.filter(pg => pg.partner_id === p.id).reduce((a,pg) => a + Number(pg.amount||0), 0);
       const totalComissao = pVendas.reduce((a,v) => a + Number(v.commission_value||0), 0);
-      const pendente = Math.max(0, totalComissao - pago);
+      const pendente = Math.max(0, Math.round((totalComissao - pago) * 100) / 100);
       // Comissão média real das vendas (ou % do parceiro se não houver vendas)
       const pctReal = pVendas.length > 0
         ? (pVendas.reduce((a,v) => a + Number(v.commission_pct||0), 0) / pVendas.length).toFixed(2)
