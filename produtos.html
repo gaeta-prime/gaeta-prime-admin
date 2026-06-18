@@ -595,13 +595,28 @@
         <td><span class="badge ${p.active ? 'badge-green' : 'badge-red'}">${p.active ? 'Ativo' : 'Inativo'}</span></td>
         <td>
           <button class="action-btn" onclick='editarProduto(${JSON.stringify(p)})'>Editar</button>
+          <button class="action-btn" onclick='duplicarProduto(${JSON.stringify(p)})'>Duplicar</button>
           <button class="action-btn danger" onclick="deletarProduto('${p.id}')">Excluir</button>
         </td>
       </tr>
     `).join('');
   }
 
-  function openModal(p = null) {
+  function duplicarProduto(p) {
+    document.getElementById('editId').value = '';
+    document.getElementById('modalTitle').textContent = 'Duplicar Produto';
+    document.getElementById('categoria').value = p.category;
+    document.getElementById('modelo').value = p.model;
+    document.getElementById('cor').value = p.color || '';
+    document.getElementById('storage').value = p.storage || '';
+    document.getElementById('custo').value = p.cost_price;
+    document.getElementById('venda').value = p.sale_price;
+    document.getElementById('status').value = String(p.active);
+    calcMargem();
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  function openModal() {
     document.getElementById('editId').value = '';
     document.getElementById('modalTitle').textContent = 'Novo Produto';
     document.getElementById('categoria').value = '';
