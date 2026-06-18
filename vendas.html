@@ -831,6 +831,7 @@
     const { error: saleError } = await sb.from('sales').update({
       sale_price: novoPreco,
       commission_pct: commissionPct,
+      commission_value: novaComissao,
       notes: novaObs || null,
     }).eq('id', vendaAtiva.id);
 
