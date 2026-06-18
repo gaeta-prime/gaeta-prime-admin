@@ -606,7 +606,8 @@
         <td style="font-size:12px">${v.payment_method || '—'}</td>
         <td>${statusBadge(v.status)}</td>
         <td style="font-size:12px;color:var(--muted)">${formatDate(v.sold_at)}</td>
-        <td><button class="action-btn" onclick="verDetalhe('${v.id}')">Abrir</button></td>
+        <td><button class="action-btn" onclick="verDetalhe('${v.id}')">Abrir</button>
+        <button class="action-btn danger" onclick="excluirVenda('${v.id}')">Excluir</button></td>
       </tr>
     `).join('');
   }
@@ -696,6 +697,14 @@
     if (error) { showToast('Erro: ' + error.message, 'error'); return; }
     showToast('Venda registrada', 'success');
     closeModal();
+    loadAll();
+  }
+
+  async function excluirVenda(id) {
+    if (!confirm('Excluir esta venda permanentemente? Esta ação não pode ser desfeita.')) return;
+    const { error } = await sb.from('sales').delete().eq('id', id);
+    if (error) { showToast('Erro ao excluir', 'error'); return; }
+    showToast('Venda excluída', 'success');
     loadAll();
   }
 
