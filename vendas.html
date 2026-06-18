@@ -371,14 +371,14 @@
     </div>
 
     <div class="resumo-venda" id="resumoVenda">
-      <div class="resumo-row"><span class="rl">Preço de custo</span><span class="rv" id="rCusto">—</span></div>
-      <div class="resumo-row"><span class="rl">Preço de tabela</span><span class="rv" id="rVendaOriginal">—</span></div>
+      <div class="resumo-row"><span class="rl">Custo</span><span class="rv" id="rCusto">—</span></div>
+      <div class="resumo-row"><span class="rl">Valor de venda</span><span class="rv" id="rVendaOriginal">—</span></div>
       <div class="resumo-row" id="rDescontoRow" style="display:none"><span class="rl">Desconto</span><span class="rv" style="color:var(--danger)" id="rDesconto">—</span></div>
-      <div class="resumo-row"><span class="rl">Preço de venda final</span><span class="rv cobre" id="rVenda">—</span></div>
+      <div class="resumo-row" id="rVendaFinalRow" style="display:none"><span class="rl">Valor final</span><span class="rv cobre" id="rVenda">—</span></div>
       <hr class="resumo-divider">
       <div class="resumo-row"><span class="rl">Lucro bruto</span><span class="rv" id="rLucro">—</span></div>
-      <div class="resumo-row"><span class="rl">Comissão parceiro</span><span class="rv" id="rComissao">—</span></div>
-      <div class="resumo-row"><span class="rl">Lucro líquido</span><span class="rv success" id="rLiquid">—</span></div>
+      <div class="resumo-row" id="rComissaoRow" style="display:none"><span class="rl">Comissão parceiro</span><span class="rv" style="color:var(--danger)" id="rComissao">—</span></div>
+      <div class="resumo-row" style="margin-top:4px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)"><span class="rl" style="font-weight:500;color:var(--off)">Lucro líquido</span><span class="rv success" id="rLiquid">—</span></div>
     </div>
 
     <div class="modal-actions">
@@ -553,18 +553,31 @@
 
     document.getElementById('rCusto').textContent = formatBRL(custo);
     document.getElementById('rVendaOriginal').textContent = formatBRL(vendaOriginal);
-    document.getElementById('rVenda').textContent = formatBRL(vendaFinal);
 
+    // Desconto — só mostra se tiver
     const rDescontoRow = document.getElementById('rDescontoRow');
+    const rVendaFinalRow = document.getElementById('rVendaFinalRow');
     if (desconto > 0) {
       rDescontoRow.style.display = 'flex';
+      rVendaFinalRow.style.display = 'flex';
       document.getElementById('rDesconto').textContent = `- ${formatBRL(desconto)}${descontoTipo === 'pct' ? ` (${descontoValorRaw}%)` : ''}`;
+      document.getElementById('rVenda').textContent = formatBRL(vendaFinal);
     } else {
       rDescontoRow.style.display = 'none';
+      rVendaFinalRow.style.display = 'none';
     }
 
     document.getElementById('rLucro').textContent = formatBRL(lucro);
-    document.getElementById('rComissao').textContent = temParceiro ? `${formatBRL(comissao)} (${commissionPct.toFixed(1)}%)` : '—';
+
+    // Comissão — só mostra se tiver parceiro
+    const rComissaoRow = document.getElementById('rComissaoRow');
+    if (temParceiro && comissao > 0) {
+      rComissaoRow.style.display = 'flex';
+      document.getElementById('rComissao').textContent = `- ${formatBRL(comissao)}`;
+    } else {
+      rComissaoRow.style.display = 'none';
+    }
+
     document.getElementById('rLiquid').textContent = formatBRL(liquido);
     document.getElementById('rLiquid').className = 'rv ' + (liquido >= 0 ? 'success' : 'danger');
     document.getElementById('resumoVenda').classList.add('show');
