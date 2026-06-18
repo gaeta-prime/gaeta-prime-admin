@@ -339,20 +339,11 @@
       </div>
     </div>
 
-    <!-- COMISSÃO PERSONALIZADA -->
+    <!-- COMISSÃO DO PARCEIRO -->
     <div id="comissaoFields" style="display:none">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Tipo de comissão</label>
-          <select id="comissaoTipo" onchange="onComissaoTipoChange()">
-            <option value="pct">Percentual (%)</option>
-            <option value="fixo">Valor fixo (R$)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Comissão <span id="comissaoLabel" style="color:var(--cobre)"></span></label>
-          <input type="number" id="comissaoValor" placeholder="0" step="0.01" oninput="calcResumo()">
-        </div>
+      <div class="form-group">
+        <label>Valor da comissão do parceiro (R$)</label>
+        <input type="number" id="comissaoValor" placeholder="0,00" step="0.01" oninput="calcResumo()">
       </div>
     </div>
 
@@ -512,33 +503,17 @@
 
   function onParceiroChange() {
     const parSel = document.getElementById('partnerId');
-    const pct = parseFloat(parSel.options[parSel.selectedIndex]?.dataset?.pct) || 0;
     const fields = document.getElementById('comissaoFields');
     if (parSel.value) {
       fields.style.display = 'block';
-      document.getElementById('comissaoTipo').value = 'pct';
-      document.getElementById('comissaoValor').value = pct;
-      document.getElementById('comissaoLabel').textContent = `(padrão: ${pct}%)`;
+      document.getElementById('comissaoValor').value = '';
     } else {
       fields.style.display = 'none';
     }
     calcResumo();
   }
 
-  function onComissaoTipoChange() {
-    const tipo = document.getElementById('comissaoTipo').value;
-    const label = document.getElementById('comissaoLabel');
-    const parSel = document.getElementById('partnerId');
-    const pct = parseFloat(parSel.options[parSel.selectedIndex]?.dataset?.pct) || 0;
-    if (tipo === 'pct') {
-      label.textContent = `(padrão: ${pct}%)`;
-      document.getElementById('comissaoValor').placeholder = '%';
-    } else {
-      label.textContent = '(R$)';
-      document.getElementById('comissaoValor').placeholder = '0,00';
-    }
-    calcResumo();
-  }
+  function onComissaoTipoChange() { calcResumo(); }
 
   function calcDesconto() {
     const tipo = document.getElementById('descontoTipo').value;
@@ -561,16 +536,14 @@
     else if (descontoTipo === 'fixo') desconto = descontoValorRaw;
     const vendaFinal = Math.max(0, vendaOriginal - desconto);
 
-    // Comissão
+    // Comissão valor fixo
     const parSel = document.getElementById('partnerId');
     const temParceiro = !!parSel.value;
     let comissao = 0;
     let commissionPct = 0;
     if (temParceiro) {
-      const comTipo = document.getElementById('comissaoTipo').value;
-      const comVal = parseFloat(document.getElementById('comissaoValor').value) || 0;
-      if (comTipo === 'pct') { commissionPct = comVal; comissao = vendaFinal * comVal / 100; }
-      else { comissao = comVal; commissionPct = vendaFinal > 0 ? (comVal / vendaFinal * 100) : 0; }
+      comissao = parseFloat(document.getElementById('comissaoValor').value) || 0;
+      commissionPct = vendaFinal > 0 ? (comissao / vendaFinal * 100) : 0;
     }
 
     if (!custo && !vendaOriginal) { document.getElementById('resumoVenda').classList.remove('show'); return; }
@@ -698,10 +671,8 @@
     salePriceFinal = Math.max(0, salePrice - desconto);
 
     if (partnerId) {
-      const comTipo = document.getElementById('comissaoTipo').value;
       const comVal = parseFloat(document.getElementById('comissaoValor').value) || 0;
-      if (comTipo === 'pct') commissionPct = comVal;
-      else commissionPct = salePriceFinal > 0 ? (comVal / salePriceFinal * 100) : 0;
+      commissionPct = salePriceFinal > 0 ? (comVal / salePriceFinal * 100) : 0;
     }
 
     const custo = parseFloat(prodOpt.dataset.custo) || 0;

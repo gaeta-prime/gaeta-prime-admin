@@ -222,7 +222,6 @@
             <th>Código</th>
             <th>Telefone</th>
             <th>E-mail</th>
-            <th>Comissão</th>
             <th>Vendas (mês)</th>
             <th>Comissão pendente</th>
             <th>Status</th>
@@ -256,9 +255,9 @@
         <div class="codigo-hint">Somente letras maiúsculas e números. Ex: <span>ALVES</span>, <span>SILVA10</span></div>
       </div>
       <div class="form-group">
-        <label>Comissão (%)</label>
-        <input type="number" id="comissao" placeholder="5" min="0" max="100" step="0.5" oninput="previewComissao()">
-        <div class="comissao-preview" id="comissaoPreview"></div>
+        <label>Senha do portal <span style="color:var(--cobre);font-size:9px">4 DÍGITOS</span></label>
+        <input type="text" id="portalPassword" placeholder="ex: 1234" maxlength="4"
+          oninput="this.value = this.value.replace(/\D/g,'')">
       </div>
     </div>
 
@@ -387,7 +386,6 @@
         <td><span class="codigo-chip">${p.code}</span></td>
         <td>${p.phone || '—'}</td>
         <td style="font-size:12px">${p.email || '—'}</td>
-        <td style="color:var(--cobre)">${p.commission_pct}%</td>
         <td>${vendasMes.length}</td>
         <td style="color:var(--warning)">${comissaoPendente > 0 ? formatBRL(comissaoPendente) : '—'}</td>
         <td><span class="badge ${p.active ? 'badge-green' : 'badge-red'}">${p.active ? 'Ativo' : 'Inativo'}</span></td>
@@ -456,11 +454,10 @@
     document.getElementById('modalTitle').textContent = 'Novo Parceiro';
     document.getElementById('nome').value = '';
     document.getElementById('codigo').value = '';
-    document.getElementById('comissao').value = '';
     document.getElementById('telefone').value = '';
     document.getElementById('email').value = '';
+    document.getElementById('portalPassword').value = '';
     document.getElementById('ativo').value = 'true';
-    document.getElementById('comissaoPreview').innerHTML = '';
     document.getElementById('modalOverlay').classList.add('open');
   }
 
@@ -469,11 +466,10 @@
     document.getElementById('modalTitle').textContent = 'Editar Parceiro';
     document.getElementById('nome').value = p.name || '';
     document.getElementById('codigo').value = p.code || '';
-    document.getElementById('comissao').value = p.commission_pct || '';
     document.getElementById('telefone').value = p.phone || '';
     document.getElementById('email').value = p.email || '';
+    document.getElementById('portalPassword').value = p.portal_password || '';
     document.getElementById('ativo').value = String(p.active);
-    previewComissao();
     document.getElementById('modalOverlay').classList.add('open');
   }
 
@@ -485,19 +481,18 @@
     const id = document.getElementById('editId').value;
     const nome = document.getElementById('nome').value.trim();
     const codigo = document.getElementById('codigo').value.trim();
-    const comissao = parseFloat(document.getElementById('comissao').value) || 0;
 
     if (!nome) { showToast('Informe o nome', 'error'); return; }
     if (!codigo) { showToast('Informe o código único', 'error'); return; }
-    if (comissao < 0 || comissao > 100) { showToast('Comissão deve ser entre 0 e 100%', 'error'); return; }
 
     const dados = {
-      name:           nome,
-      code:           codigo,
-      commission_pct: comissao,
-      phone:          document.getElementById('telefone').value.trim() || null,
-      email:          document.getElementById('email').value.trim() || null,
-      active:         document.getElementById('ativo').value === 'true',
+      name:            nome,
+      code:            codigo,
+      commission_pct:  0,
+      phone:           document.getElementById('telefone').value.trim() || null,
+      email:           document.getElementById('email').value.trim() || null,
+      portal_password: document.getElementById('portalPassword').value.trim() || null,
+      active:          document.getElementById('ativo').value === 'true',
     };
 
     let error;

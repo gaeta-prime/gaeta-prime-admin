@@ -338,57 +338,16 @@
   function formatDate(d) { if(!d) return '—'; return new Date(d).toLocaleDateString('pt-BR'); }
 
   async function init() {
-    // Captura sessão do magic link (hash na URL)
-    const { data: { session: sessionHash }, error: hashError } = await sb.auth.getSession();
+    const stored = sessionStorage.getItem('parceiro');
+    if (!stored) { window.location.href = 'parceiro-acesso.html'; return; }
 
-    // Tenta pegar sessão do hash da URL (magic link redirect)
-    if (window.location.hash) {
-      const { data, error } = await sb.auth.exchangeCodeForSession(window.location.search);
-      if (data?.session) {
-        await carregarParceiro(data.session);
-        return;
-      }
-    }
+    parceiro = JSON.parse(stored);
 
-    if (sessionHash) {
-      await carregarParceiro(sessionHash);
-      return;
-    }
-
-    // Aguarda evento de auth (magic link)
-    sb.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        await carregarParceiro(session);
-      } else if (!session) {
-        window.location.href = 'parceiro-acesso.html';
-      }
-    });
-
-    // Timeout — se não logar em 5 segundos, redireciona
-    setTimeout(() => {
-      sb.auth.getSession().then(({ data }) => {
-        if (!data.session) window.location.href = 'parceiro-acesso.html';
-      });
-    }, 5000);
-  }
-
-  async function carregarParceiro(session) {
-    const email = session.user.email;
-
-    const { data, error } = await sb.from('partners')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    if (error || !data) {
-      alert('Parceiro não encontrado. Entre em contato com a Gaeta Prime.');
-      await sb.auth.signOut();
-      window.location.href = 'parceiro-acesso.html';
-      return;
-    }
+    // Busca dados completos do parceiro
+    const { data, error } = await sb.from('partners').select('*').eq('id', parceiro.id).single();
+    if (error || !data) { window.location.href = 'parceiro-acesso.html'; return; }
 
     parceiro = data;
-
     document.getElementById('pageTitle').textContent = `Olá, ${parceiro.name.split(' ')[0]}!`;
     document.getElementById('headerCodigo').textContent = parceiro.code;
     document.getElementById('cardPct').textContent = parceiro.commission_pct + '%';
@@ -464,7 +423,7 @@
   }
 
   async function handleLogout() {
-    await sb.auth.signOut();
+    sessionStorage.removeItem('parceiro');
     window.location.href = 'parceiro-acesso.html';
   }
 
