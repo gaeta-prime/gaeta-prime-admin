@@ -444,20 +444,21 @@
       const pago = pagamentos.filter(pg => pg.partner_id === p.id).reduce((a,pg) => a + Number(pg.amount||0), 0);
       const totalComissao = pVendas.reduce((a,v) => a + Number(v.commission_value||0), 0);
       const pendente = Math.max(0, totalComissao - pago);
-      const totalGanho = pVendas.reduce((a,v) => a + Number(v.commission_value||0), 0);
-      const jaP = pagamentos.filter(pg => pg.partner_id === p.id)
-        .reduce((a,pg) => a + Number(pg.amount||0), 0);
+      // Comissão média real das vendas (ou % do parceiro se não houver vendas)
+      const pctReal = pVendas.length > 0
+        ? (pVendas.reduce((a,v) => a + Number(v.commission_pct||0), 0) / pVendas.length).toFixed(2)
+        : p.commission_pct;
 
       return `
         <div class="parceiro-row">
           <div class="parceiro-info">
             <div class="parceiro-nome">${p.name} <span class="codigo-chip">${p.code}</span></div>
-            <div class="parceiro-meta">${p.commission_pct}% de comissão · ${pVendas.length} venda${pVendas.length !== 1 ? 's' : ''}</div>
+            <div class="parceiro-meta">${pctReal}% de comissão · ${pVendas.length} venda${pVendas.length !== 1 ? 's' : ''}</div>
           </div>
           <div class="parceiro-vals">
             <div class="pval">
               <div class="pval-label">Total gerado</div>
-              <div class="pval-num cobre" style="color:var(--cobre)">${formatBRL(totalGanho)}</div>
+              <div class="pval-num cobre" style="color:var(--cobre)">${formatBRL(totalComissao)}</div>
             </div>
             <div class="pval">
               <div class="pval-label">Pendente</div>
@@ -465,10 +466,10 @@
             </div>
             <div class="pval">
               <div class="pval-label">Já pago</div>
-              <div class="pval-num success">${formatBRL(jaP)}</div>
+              <div class="pval-num success">${formatBRL(pago)}</div>
             </div>
           </div>
-          ${pendente > 0 ? `<button class="btn-primary" onclick="openModal('${p.id}','${p.name}',${pendente})">Pagar</button>` : '<span style="font-size:12px;color:var(--success)">Em dia</span>'}
+          ${pendente > 0 ? `<button class="btn-primary" onclick="openModal('${p.id}','${p.name}',${pendente})">Pagar</button>` : '<span style="font-size:12px;color:var(--success)">✓ Em dia</span>'}
         </div>
       `;
     }).join('');
