@@ -494,7 +494,15 @@
     selStatus.innerHTML = Object.entries(STATUS_MAP).map(([k,v]) => `<option value="${k}">${v[1]}</option>`).join('');
   }
 
-  function onProdutoChange() { calcResumo(); }
+  function onProdutoChange() {
+    const prodSel = document.getElementById('productId');
+    const opt = prodSel.options[prodSel.selectedIndex];
+    const precoVenda = parseFloat(opt?.dataset?.venda) || 0;
+    if (precoVenda > 0) {
+      document.getElementById('salePrice').value = precoVenda;
+    }
+    calcResumo();
+  }
 
   function onClienteChange() {
     const val = document.getElementById('customerId').value;
