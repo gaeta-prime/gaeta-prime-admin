@@ -811,7 +811,7 @@
 
     document.getElementById('dEditPhone').value = v.customers?.phone || '';
     document.getElementById('dEditPrice').value = v.sale_price || '';
-    document.getElementById('dEditComissao').value = v.commission_value || '';
+    document.getElementById('dEditComissao').value = v.commission_value ? parseFloat(v.commission_value).toFixed(2) : '';
     document.getElementById('dEditObs').value = v.notes || '';
 
     document.getElementById('drawerOverlay').classList.add('open');
