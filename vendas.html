@@ -482,8 +482,9 @@
     const selProd = document.getElementById('productId');
     selProd.innerHTML = '<option value="">Selecione o produto</option>';
     produtos.forEach(p => {
-      const lbl = `${p.category} — ${p.model}${p.color?' '+p.color:''}${p.storage?' '+p.storage:''}`;
-      selProd.innerHTML += `<option value="${p.id}" data-custo="${p.cost_price}" data-venda="${p.sale_price}" data-nome="${lbl}">${lbl}</option>`;
+      const cond = p.condition || 'VITRINE';
+      const lbl = `${p.category} — ${p.model}${p.color?' '+p.color:''}${p.storage?' '+p.storage:''} [${cond}]`;
+      selProd.innerHTML += `<option value="${p.id}" data-custo="${p.cost_price}" data-venda="${p.sale_price}" data-nome="${p.category} — ${p.model}${p.color?' '+p.color:''}${p.storage?' '+p.storage:''}" data-condition="${cond}">${lbl}</option>`;
     });
 
     const selCli = document.getElementById('customerId');
@@ -705,6 +706,7 @@
 
     const custo = parseFloat(prodOpt.dataset.custo) || 0;
     const nomeProduto = prodOpt.dataset.nome || prodOpt.text;
+    const condition = prodOpt.dataset.condition || 'VITRINE';
 
     const { error } = await sb.from('sales').insert({
       customer_id:     customerId || null,
@@ -715,6 +717,7 @@
       commission_pct:  commissionPct,
       payment_method:  document.getElementById('paymentMethod').value || null,
       channel:         document.getElementById('channel').value || null,
+      condition:       condition,
       status:          'pedido_recebido',
       sold_at:         document.getElementById('soldAt').value || new Date().toISOString(),
     });
@@ -748,8 +751,7 @@
 
     // Garantia — apenas vitrine, 90 dias
     let garantiaHTML = '';
-    const nomeUpper = (v.product_name || '').toUpperCase();
-    const isVitrine = nomeUpper.includes('VITRINE') || v.condition === 'VITRINE';
+    const isVitrine = v.condition === 'VITRINE';
     if (isVitrine && v.sold_at) {
       const dataVenda = new Date(v.sold_at);
       const vencimento = new Date(dataVenda.getTime() + 90 * 24 * 60 * 60 * 1000);
@@ -764,6 +766,7 @@
     }
 
     document.getElementById('dDetalhes').innerHTML = `
+      <div class="stat-row"><span class="stat-label">Condição</span><span class="stat-val"><span class="badge ${v.condition === 'LACRADO' ? 'badge-green' : 'badge-yellow'}">${v.condition || '—'}</span></span></div>
       <div class="stat-row"><span class="stat-label">Pagamento</span><span class="stat-val">${v.payment_method || '—'}</span></div>
       <div class="stat-row"><span class="stat-label">Canal</span><span class="stat-val">${v.channel || '—'}</span></div>
       <div class="stat-row"><span class="stat-label">Parceiro</span><span class="stat-val">${parLabel}</span></div>
