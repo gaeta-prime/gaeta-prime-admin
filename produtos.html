@@ -471,6 +471,7 @@
             <th>Modelo</th>
             <th>Cor</th>
             <th>Storage</th>
+            <th>Condição</th>
             <th>Custo</th>
             <th>Venda</th>
             <th>Margem</th>
@@ -535,8 +536,11 @@
 
     <div class="form-row">
       <div class="form-group">
-        <label>Margem calculada</label>
-        <div class="margem-preview" id="margemPreview">—</div>
+        <label>Condição</label>
+        <select id="condicao">
+          <option value="VITRINE">Vitrine</option>
+          <option value="LACRADO">Lacrado</option>
+        </select>
       </div>
       <div class="form-group">
         <label>Status</label>
@@ -544,6 +548,13 @@
           <option value="true">Ativo</option>
           <option value="false">Inativo</option>
         </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Margem calculada</label>
+        <div class="margem-preview" id="margemPreview">—</div>
       </div>
     </div>
 
@@ -628,6 +639,7 @@
         <td>${p.model}</td>
         <td>${p.color || '—'}</td>
         <td>${p.storage || '—'}</td>
+        <td><span class="badge ${p.condition === 'LACRADO' ? 'badge-green' : 'badge-yellow'}">${p.condition || 'VITRINE'}</span></td>
         <td>${formatBRL(p.cost_price)}</td>
         <td>${formatBRL(p.sale_price)}</td>
         <td><span class="margem ${margemClass(p.cost_price, p.sale_price)}">${margemText(p.cost_price, p.sale_price)}</span></td>
@@ -650,6 +662,7 @@
     document.getElementById('storage').value = p.storage || '';
     document.getElementById('custo').value = p.cost_price;
     document.getElementById('venda').value = p.sale_price;
+    document.getElementById('condicao').value = p.condition || 'VITRINE';
     document.getElementById('status').value = String(p.active);
     calcMargem();
     document.getElementById('modalOverlay').classList.add('open');
@@ -664,6 +677,7 @@
     document.getElementById('storage').value = '';
     document.getElementById('custo').value = '';
     document.getElementById('venda').value = '';
+    document.getElementById('condicao').value = 'VITRINE';
     document.getElementById('status').value = 'true';
     document.getElementById('margemPreview').textContent = '—';
     document.getElementById('margemPreview').style.color = 'var(--cobre)';
@@ -679,6 +693,7 @@
     document.getElementById('storage').value = p.storage || '';
     document.getElementById('custo').value = p.cost_price;
     document.getElementById('venda').value = p.sale_price;
+    document.getElementById('condicao').value = p.condition || 'VITRINE';
     document.getElementById('status').value = String(p.active);
     calcMargem();
     document.getElementById('modalOverlay').classList.add('open');
@@ -697,6 +712,7 @@
       storage:    document.getElementById('storage').value.trim() || null,
       cost_price: parseFloat(document.getElementById('custo').value) || 0,
       sale_price: parseFloat(document.getElementById('venda').value) || 0,
+      condition:  document.getElementById('condicao').value,
       active:     document.getElementById('status').value === 'true',
     };
 
